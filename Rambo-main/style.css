@@ -3607,7 +3607,7 @@ body {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #111827; /* Dark Navy for high contrast */
+  color: #fff6e5; /* Dark Navy for high contrast */
   letter-spacing: 0.5px;
 }
 
@@ -3620,7 +3620,7 @@ body {
   border-radius: 50%;
   border: 1px solid #e5e7eb; /* Subtle border like the image */
   background: #ffffff;
-  color: #111827;
+  color: #fff6e5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3644,7 +3644,7 @@ body {
 
 #recordsContainer {
   padding: 15px;
-  background-color: #111827; /* Dark background like the screenshot */
+  background-color: #f3e8ff; /* Dark background like the screenshot */
   min-height: 100vh;
 }
 
@@ -3692,7 +3692,7 @@ body {
 .record-transaction {
   font-weight: 600;
   font-size: 15px;
-  color: #111827;
+  color: #fff6e5;
   margin-bottom: 4px;
 }
 
@@ -3765,7 +3765,7 @@ body {
   padding: 15px 10px;
   overflow-x: auto;
   justify-content: center;
-  background-color: #111827; /* Matches the dark background */
+  background-color: #f3e8ff; /* Matches the dark background */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle dark border */
 }
 
