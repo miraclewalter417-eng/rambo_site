@@ -3182,131 +3182,89 @@ async function loadRecords(container) {
   const user = auth.currentUser;
   if (!user) return;
 
-  container.insertAdjacentHTML(
-    "beforeend",
-    `
-    <div class="record-card" id="welcome-bonus-card">
-      <div class="record-icon-box ${bonusClass}" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2);">
-        <i class="fa-solid ${bonusIcon}"></i>
-      </div>
-      <div class="record-middle">
-        <div class="record-transaction">Registration Bonus</div>
-        <div class="record-time">Accrued on Signup</div>
-      </div>
-      <div class="record-right">
-        <div class="record-amount amount-plus">+₦500.00</div>
-        <div class="record-status status-success">Confirmed</div>
-      </div>
-    </div>
-    `
-  );
+  // Fetch Welcome Bonus from User Doc
+  getDoc(doc(db, "users", user.uid)).then(userSnap => {
+    if (userSnap.exists()) {
+      const bonus = userSnap.data().bonus || 500;
+      container.insertAdjacentHTML("beforeend", `
+        <div class="record-card" id="welcome-bonus-card">
+          <div class="record-icon-box icon-bonus">
+            <i class="fa-solid fa-gift"></i>
+          </div>
+          <div class="record-middle">
+            <div class="record-transaction">Registration Bonus</div>
+            <div class="record-time">Accrued on Signup</div>
+          </div>
+          <div class="record-right">
+            <div class="record-amount amount-plus">+₦${bonus.toLocaleString()}</div>
+            <div class="record-status status-success">Confirmed</div>
+          </div>
+        </div>
+      `);
+    }
+  });
 
-  // 🚀 SWITCHED: 'withdrawals' database targets coreNextDb now instead of transactionDb
-  const collections = [
-    { name: "withdrawals", label: "Withdrawal", database: coreNextDb },
-    { name: "deposits", label: "Deposit", database: transactionDb },
-    { name: "records", label: "Commission", database: transactionDb }
+  // Define all transaction streams
+  const streams = [
+    { ref: query(collection(coreNextDb, "withdrawals"), where("uid", "==", user.uid)), label: "Withdrawal" },
+    { ref: query(collection(transactionDb, "deposits"), where("uid", "==", user.uid)), label: "Deposit" },
+    { ref: query(collection(transactionDb, "records"), where("uid", "==", user.uid)), label: "Commission" },
+    { ref: collection(db, "users", user.uid, "records"), label: "Income" }
   ];
 
-  collections.forEach(({ name, label, database }) => {
-    let colRef;
-
-    if (name === "records") {
-      colRef = collection(db, "users", user.uid, "records");
-    } else {
-      colRef = query(collection(database, name), where("uid", "==", user.uid));
-    }
-
-    onSnapshot(colRef, (snapshot) => {
+  streams.forEach(({ ref, label }) => {
+    onSnapshot(ref, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
-        if (change.type !== "added") return;
-
-        const rowId = `${name}-${change.doc.id}`;
-        if (document.getElementById(rowId)) return;
-
-        const data = change.doc.data();
-        const iconConfig = getIconConfig(label);
-
-        // ---------------- STATUS ----------------
-        let statusText = "Pending";
-        let statusClass = "status-pending";
-
-        const s = data.status?.toLowerCase();
-
-        if (s === "success" || s === "approved") {
-          statusText = "Confirmed";
-          statusClass = "status-success";
-        } else if (s === "failed" || s === "declined") {
-          statusText = "Failed";
-          statusClass = "status-failed";
+        if (change.type === "added") {
+          renderSingleRecord(container, change.doc.id, change.doc.data(), label);
         }
-
-        // ---------------- LABEL LOGIC ----------------
-        let displayLabel = label;
-        let subtitle = data.description || "Transaction";
-
-        if (name === "records") {
-          if (data.type === "Admin Update") {
-            displayLabel = "Added via Admin";
-            subtitle = "Manual credit from admin";
-          } else {
-            displayLabel = "Income";
-            subtitle = "Craft Land";
-          }
-
-          statusText = "Confirmed";
-          statusClass = "status-success";
-        }
-
-        // ---------------- DATE ----------------
-        let dateObj = data.approvedAt || data.createdAt || data.timestamp;
-        if (dateObj?.toDate) dateObj = dateObj.toDate();
-        else if (dateObj) dateObj = new Date(dateObj);
-
-        const formattedDate = formatRecordDate(dateObj);
-
-        // ---------------- AMOUNT ----------------
-        // Use originalAmount if it's a withdrawal, otherwise fall back to amount
-        const amount = (name === "withdrawals") 
-          ? (data.originalAmount ?? data.amount ?? 0) 
-          : (data.amount ?? 0);
-
-        const isWithdrawal = name === "withdrawals";
-        const amountSign = isWithdrawal ? "-" : "+";
-        const amountClass = isWithdrawal ? "amount-minus" : "amount-plus";
-
-        // ---------------- RENDER ----------------
-        const html = `
-          <div class="record-card" id="${rowId}">
-            <div class="record-icon-box ${iconConfig.class}">
-              <i class="fa-solid ${iconConfig.icon}"></i>
-            </div>
-
-            <div class="record-middle">
-              <div class="record-transaction">${displayLabel}</div>
-              <div style="font-size:11px;color:#64748b;margin-bottom:2px;">
-                ${subtitle}
-              </div>
-              <div class="record-time">${formattedDate}</div>
-            </div>
-
-            <div class="record-right">
-              <div class="record-amount ${amountClass}">
-                ${amountSign}₦${Number(amount).toLocaleString()}
-              </div>
-              <div class="record-status ${statusClass}">
-                ${statusText}
-              </div>
-            </div>
-          </div>
-        `;
-
-        container.insertAdjacentHTML("afterbegin", html);
       });
     });
   });
 }
 
+function renderSingleRecord(container, docId, data, label) {
+  const rowId = `rec-${label}-${docId}`;
+  if (document.getElementById(rowId)) return;
+
+  const iconConfig = getIconConfig(label);
+  let statusText = "Pending", statusClass = "status-pending";
+  const s = data.status?.toLowerCase();
+
+  if (s === "success" || s === "approved" || label === "Income" || label === "Commission") {
+    statusText = "Confirmed";
+    statusClass = "status-success";
+  } else if (s === "failed" || s === "declined") {
+    statusText = "Failed";
+    statusClass = "status-failed";
+  }
+
+  let dateObj = data.timestamp || data.createdAt || data.approvedAt;
+  if (dateObj?.toDate) dateObj = dateObj.toDate();
+  else if (dateObj) dateObj = new Date(dateObj);
+
+  const amount = data.amount || data.originalAmount || 0;
+  const isNegative = label === "Withdrawal";
+
+  const html = `
+    <div class="record-card" id="${rowId}">
+      <div class="record-icon-box ${iconConfig.class}">
+        <i class="fa-solid ${iconConfig.icon}"></i>
+      </div>
+      <div class="record-middle">
+        <div class="record-transaction">${data.plan || data.type || label}</div>
+        <div class="record-time">${formatRecordDate(dateObj)}</div>
+      </div>
+      <div class="record-right">
+        <div class="record-amount ${isNegative ? 'amount-minus' : 'amount-plus'}">
+          ${isNegative ? '-' : '+'}₦${Number(amount).toLocaleString()}
+        </div>
+        <div class="record-status ${statusClass}">${statusText}</div>
+      </div>
+    </div>
+  `;
+  container.insertAdjacentHTML("afterbegin", html);
+}
 
 document.querySelector(".settings-item")?.addEventListener("click", () => {
   // Hide all pages safely

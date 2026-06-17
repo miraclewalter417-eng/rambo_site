@@ -391,7 +391,7 @@ body {
   width: 100%;
   max-width: 400px; /* Locked to standard compact mobile flow width */
   margin: 0 auto;
-  padding: 16px;
+  padding: 14px;
   box-sizing: border-box;
   background: transparent; /* No heavy external background container boxes */
 }
@@ -457,8 +457,8 @@ body {
 
 /* COMPACT VECTOR ICONS (Not too big, exactly matches sample layout) */
 .action-icon {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   transition: transform 0.2s ease;
 }
 
