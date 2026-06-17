@@ -2622,12 +2622,12 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #6b7280;
+  color: wheat;
   padding: 5px 0;
 }
 
 .detail-item span:last-child {
-  color: #111827;
+  color: wheat;
 }
 
 /* PROGRESS */
