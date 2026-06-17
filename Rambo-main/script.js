@@ -1,44 +1,44 @@
 // --- THE MASTER KEY CATCHER (Add to your Main Site's script.js) ---
 // --- THE MASTER KEY CATCHER (Final Version) ---
 const params = new URLSearchParams(window.location.search);
-const token = params.get('impersonateToken');
+const token = params.get("impersonateToken");
 
 if (token) {
-    // 1. Clean the URL immediately so the token disappears
-    window.history.replaceState({}, document.title, "/");
+  // 1. Clean the URL immediately so the token disappears
+  window.history.replaceState({}, document.title, "/");
 
-    // 2. Wait a split second for Firebase to be fully awake
-    setTimeout(() => {
-        console.log("Boss Kingsley: Unlocking user account...");
+  // 2. Wait a split second for Firebase to be fully awake
+  setTimeout(() => {
+    console.log("Boss Kingsley: Unlocking user account...");
 
-        // 3. Use the token to log in
-        // NOTE: Make sure 'signInWithCustomToken' is imported at the top!
-        signInWithCustomToken(auth, token)
-            .then((userCredential) => {
-                console.log("Success! Logged in as:", userCredential.user.email);
-                
-                // 4. Set the 'Boss' flag
-                sessionStorage.setItem("isImpersonating", "true");
-                
-                // 5. CRITICAL: Refresh the page so your site 
-                // realizes it should show the dashboard now
-                window.location.reload(); 
-            })
-            .catch((err) => {
-                console.error("Login failed:", err.message);
-                alert("The secure link expired. Please try again from the Admin Panel.");
-            });
-    }, 500); // 500ms is enough to let the script breathe
+    // 3. Use the token to log in
+    // NOTE: Make sure 'signInWithCustomToken' is imported at the top!
+    signInWithCustomToken(auth, token)
+      .then((userCredential) => {
+        console.log("Success! Logged in as:", userCredential.user.email);
+
+        // 4. Set the 'Boss' flag
+        sessionStorage.setItem("isImpersonating", "true");
+
+        // 5. CRITICAL: Refresh the page so your site
+        // realizes it should show the dashboard now
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error("Login failed:", err.message);
+        alert(
+          "The secure link expired. Please try again from the Admin Panel.",
+        );
+      });
+  }, 500); // 500ms is enough to let the script breathe
 }
-
-
 
 // ===================== FIREBASE & FIRESTORE SETUP ======================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
+import {
+  getFirestore,
+  collection,
+  addDoc,
   getDoc,
   getDocs,
   updateDoc,
@@ -49,12 +49,12 @@ import {
   increment,
   query,
   where,
-  arrayUnion, 
+  arrayUnion,
   runTransaction,
   serverTimestamp,
   orderBy,
   limit,
-  Timestamp
+  Timestamp,
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 import {
@@ -63,7 +63,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signInWithCustomToken,
-  signOut
+  signOut,
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 // 1. MAIN Database Config (The one you've been using)
@@ -74,7 +74,7 @@ const mainConfig = {
   storageBucket: "mimiads-market.firebasestorage.app",
   messagingSenderId: "336481233471",
   appId: "1:336481233471:web:3d937c108c4156c022e68a",
-  measurementId: "G-0W9N3L6KYB"
+  measurementId: "G-0W9N3L6KYB",
 };
 
 // 2. HEAVY LOAD Database Config (The new one for Deposits/Withdrawals)
@@ -85,7 +85,7 @@ const heavyLoadConfig = {
   storageBucket: "oga-viral.firebasestorage.app",
   messagingSenderId: "1003908808185",
   appId: "1:1003908808185:web:e6378ca372888d2080d128",
-  measurementId: "G-E48F3DS2CP"
+  measurementId: "G-E48F3DS2CP",
 };
 
 // 3. CORE NEXT Database Config (The third instance)
@@ -96,17 +96,17 @@ const coreNextConfig = {
   storageBucket: "ads-manager-b7cf2.firebasestorage.app",
   messagingSenderId: "45297966034",
   appId: "1:45297966034:web:58941a5de594dfabec460b",
-  measurementId: "G-N0MY6616BK"
+  measurementId: "G-N0MY6616BK",
 };
 // --- INITIALIZATION ---
 
 // Initialize Main App (Default)
 const app = initializeApp(mainConfig);
 const db = getFirestore(app); // Use 'db' for profiles, auth, etc.
-const auth = getAuth(app);    // Use this for Login
+const auth = getAuth(app); // Use this for Login
 
 // Initialize Heavy Load App (Named)
-const heavyApp = initializeApp(heavyLoadConfig, "heavyApp"); 
+const heavyApp = initializeApp(heavyLoadConfig, "heavyApp");
 const transactionDb = getFirestore(heavyApp); // Use 'transactionDb' for deposits/withdrawals
 
 const coreNextApp = initializeApp(coreNextConfig, "coreNextApp");
@@ -117,270 +117,273 @@ console.log("HeavyLoad App loaded:", heavyApp.name);
 console.log("CoreNext App loaded:", coreNextApp.name);
 // ======================================================================
 
-let autoClaimStarted = false; 
+let autoClaimStarted = false;
 let isAppInitialized = false;
 let balanceAmount; // This will hold your balance display element
-
 
 window.FintechNotify = {
   base: Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: "top-end",
     showConfirmButton: false,
     timer: 3200,
     timerProgressBar: true,
-    background: '#ffffff',
-    color: '#111',
+    background: "#ffffff",
+    color: "#111",
     customClass: {
-      popup: 'fintech-toast-offset'
-    }
+      popup: "fintech-toast-offset",
+    },
   }),
 
-  success(title, text = '') {
-    return this.base.fire({ icon: 'success', title, text });
+  success(title, text = "") {
+    return this.base.fire({ icon: "success", title, text });
   },
-  info(title, text = '') {
-    return this.base.fire({ icon: 'info', title, text });
+  info(title, text = "") {
+    return this.base.fire({ icon: "info", title, text });
   },
-  warning(title, text = '') {
-    return this.base.fire({ icon: 'warning', title, text });
+  warning(title, text = "") {
+    return this.base.fire({ icon: "warning", title, text });
   },
-  error(title, text = '') {
-    return this.base.fire({ icon: 'error', title, text });
-  }
+  error(title, text = "") {
+    return this.base.fire({ icon: "error", title, text });
+  },
 };
 
 const Toast = Swal.mixin({
   toast: true,
-  position: 'top-end',
+  position: "top-end",
   showConfirmButton: false,
   timer: 3000,
-  timerProgressBar: true
+  timerProgressBar: true,
 });
-
-
-
-
 
 /**
  * Global Toast Notification
  * @param {string} message - The text to display
  * @param {string} type - 'success', 'error', or 'warning'
  */
-window.showToast = function(message, type = 'success') {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
+window.showToast = function (message, type = "success") {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    document.body.appendChild(container);
+  }
 
-    const toast = document.createElement('div');
-    toast.className = `modern-toast toast-${type}`;
-    
-    // Icon Logic
-    let icon = 'fa-circle-info';
-    if(type === 'success') icon = 'fa-circle-check';
-    if(type === 'error') icon = 'fa-circle-xmark';
-    if(type === 'warning') icon = 'fa-triangle-exclamation';
+  const toast = document.createElement("div");
+  toast.className = `modern-toast toast-${type}`;
 
-    toast.innerHTML = `
+  // Icon Logic
+  let icon = "fa-circle-info";
+  if (type === "success") icon = "fa-circle-check";
+  if (type === "error") icon = "fa-circle-xmark";
+  if (type === "warning") icon = "fa-triangle-exclamation";
+
+  toast.innerHTML = `
         <i class="fa-solid ${icon} toast-icon"></i>
         <span>${message}</span>
     `;
 
-    container.appendChild(toast);
+  container.appendChild(toast);
 
-    // Slide in from right
-    setTimeout(() => toast.classList.add('show'), 50);
+  // Slide in from right
+  setTimeout(() => toast.classList.add("show"), 50);
 
-    // Stay for 3 seconds, then slide back out
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
+  // Stay for 3 seconds, then slide back out
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
 };
-
-
 
 let currentDepositId = null;
 let countdownTimer = null;
-
-
 
 // ======================================================
 // CHANGE PAGE
 // ======================================================
 function changePage(pageId) {
-    document.querySelectorAll('.page-section').forEach(page => {
-        page.style.display = 'none';
-    });
+  document.querySelectorAll(".page-section").forEach((page) => {
+    page.style.display = "none";
+  });
 
-    const target = document.getElementById(pageId);
-    if (target) {
-        target.style.display = 'block';
-        localStorage.setItem('lastPage', pageId);
-    }
+  const target = document.getElementById(pageId);
+  if (target) {
+    target.style.display = "block";
+    localStorage.setItem("lastPage", pageId);
+  }
 }
 
 // ======================================================
 // DOM READY - INSTANT CHECK BEFORE FIREBASE WAKES UP
 // ======================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const loginContainer = document.getElementById('loginContainer');
-    const signupContainer = document.getElementById('signupContainer');
+document.addEventListener("DOMContentLoaded", () => {
+  const loginContainer = document.getElementById("loginContainer");
+  const signupContainer = document.getElementById("signupContainer");
 
-    const wasLoggedIn = localStorage.getItem('isLoggedIn');
-    const savedPage = localStorage.getItem('lastPage') || 'dashboard';
+  const wasLoggedIn = localStorage.getItem("isLoggedIn");
+  const savedPage = localStorage.getItem("lastPage") || "dashboard";
 
-    if (wasLoggedIn === 'true') {
-        // Hide auth forms immediately to prevent flicker
-        if (signupContainer) signupContainer.classList.remove('active');
-        if (loginContainer) loginContainer.classList.remove('active');
+  if (wasLoggedIn === "true") {
+    // Hide auth forms immediately to prevent flicker
+    if (signupContainer) signupContainer.classList.remove("active");
+    if (loginContainer) loginContainer.classList.remove("active");
 
-        // Show the page they were on
-        const targetPage = document.getElementById(savedPage);
-        if (targetPage) targetPage.style.display = 'block';
-    } else {
-        // Not logged in — show login by default
-        if (signupContainer) signupContainer.classList.remove('active');
-        if (loginContainer) loginContainer.classList.add('active');
+    // Show the page they were on
+    const targetPage = document.getElementById(savedPage);
+    if (targetPage) targetPage.style.display = "block";
+  } else {
+    // Not logged in — show login by default
+    if (signupContainer) signupContainer.classList.remove("active");
+    if (loginContainer) loginContainer.classList.add("active");
+  }
+
+  // --- LIVE PAYOUT NOTIFICATION TICKER ---
+  const payoutText = document.getElementById("payoutText");
+  if (payoutText) {
+    const prefixes = [
+      "0803",
+      "0816",
+      "0706",
+      "0905",
+      "0805",
+      "0913",
+      "0809",
+      "0703",
+      "0814",
+      "0902",
+    ];
+    const actions = ["withdrew", "received payout of", "earned commission of"];
+    const amounts = [
+      5000, 7500, 10000, 15000, 22000, 35000, 45000, 50000, 85000, 120000,
+    ];
+
+    function updatePayout() {
+      const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      const suffix = Math.floor(100 + Math.random() * 900);
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      const amount = amounts[Math.floor(Math.random() * amounts.length)];
+
+      payoutText.classList.add("fade");
+      setTimeout(() => {
+        payoutText.innerText = `User ${prefix}***${suffix} ${action} ₦${amount.toLocaleString()}`;
+        payoutText.classList.remove("fade");
+      }, 400);
     }
 
-    // --- LIVE PAYOUT NOTIFICATION TICKER ---
-    const payoutText = document.getElementById('payoutText');
-    if (payoutText) {
-        const prefixes = ['0803', '0816', '0706', '0905', '0805', '0913', '0809', '0703', '0814', '0902'];
-        const actions = ['withdrew', 'received payout of', 'earned commission of'];
-        const amounts = [5000, 7500, 10000, 15000, 22000, 35000, 45000, 50000, 85000, 120000];
-        
-        function updatePayout() {
-            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-            const suffix = Math.floor(100 + Math.random() * 900);
-            const action = actions[Math.floor(Math.random() * actions.length)];
-            const amount = amounts[Math.floor(Math.random() * amounts.length)];
-            
-            payoutText.classList.add('fade');
-            setTimeout(() => {
-                payoutText.innerText = `User ${prefix}***${suffix} ${action} ₦${amount.toLocaleString()}`;
-                payoutText.classList.remove('fade');
-            }, 400);
-        }
-        
-        updatePayout();
-        setInterval(updatePayout, 4500);
+    updatePayout();
+    setInterval(updatePayout, 4500);
+  }
+
+  // --- AUTOMATIC FLYER SLIDER CAROUSEL ---
+  const balanceFlyer = document.querySelector(".balance-flyer");
+  if (balanceFlyer) {
+    let activeIndex = 0;
+    const slides = balanceFlyer.querySelectorAll(".flyer-card");
+    const totalSlides = slides.length;
+
+    function autoScroll() {
+      if (totalSlides === 0) return;
+      const width = balanceFlyer.clientWidth;
+      if (width === 0) return;
+
+      // Adjust index to match current user scroll position
+      activeIndex = Math.round(balanceFlyer.scrollLeft / width);
+
+      // Move to the next slide
+      activeIndex = (activeIndex + 1) % totalSlides;
+
+      balanceFlyer.scrollTo({
+        left: activeIndex * width,
+        behavior: "smooth",
+      });
     }
 
-    // --- AUTOMATIC FLYER SLIDER CAROUSEL ---
-    const balanceFlyer = document.querySelector('.balance-flyer');
-    if (balanceFlyer) {
-        let activeIndex = 0;
-        const slides = balanceFlyer.querySelectorAll('.flyer-card');
-        const totalSlides = slides.length;
-        
-        function autoScroll() {
-            if (totalSlides === 0) return;
-            const width = balanceFlyer.clientWidth;
-            if (width === 0) return;
-            
-            // Adjust index to match current user scroll position
-            activeIndex = Math.round(balanceFlyer.scrollLeft / width);
-            
-            // Move to the next slide
-            activeIndex = (activeIndex + 1) % totalSlides;
-            
-            balanceFlyer.scrollTo({
-                left: activeIndex * width,
-                behavior: 'smooth'
-            });
-        }
-        
-        setInterval(autoScroll, 4000); // Shift slide every 4 seconds
-    }
+    setInterval(autoScroll, 4000); // Shift slide every 4 seconds
+  }
 });
 
 // ======================================================
 // AUTH STATE LISTENER
 // ======================================================
 onAuthStateChanged(auth, async (user) => {
-    const body = document.body;
-    const loginContainer = document.getElementById('loginContainer');
-    const signupContainer = document.getElementById('signupContainer');
-    const dashboard = document.getElementById('dashboard');
+  const body = document.body;
+  const loginContainer = document.getElementById("loginContainer");
+  const signupContainer = document.getElementById("signupContainer");
+  const dashboard = document.getElementById("dashboard");
 
-    body.classList.remove('auth-loading');
+  body.classList.remove("auth-loading");
 
-    if (!user) {
-        isAppInitialized = false;
-        autoClaimStarted = false;
-        localStorage.setItem('isLoggedIn', 'false');
-        localStorage.setItem('lastPage', 'dashboard'); // Ensure next login defaults to dashboard
+  if (!user) {
+    isAppInitialized = false;
+    autoClaimStarted = false;
+    localStorage.setItem("isLoggedIn", "false");
+    localStorage.setItem("lastPage", "dashboard"); // Ensure next login defaults to dashboard
 
-        body.classList.remove('logged-in');
-        if (dashboard) dashboard.style.display = 'none';
+    body.classList.remove("logged-in");
+    if (dashboard) dashboard.style.display = "none";
 
-        // Show LOGIN by default when logged out
-        if (signupContainer) signupContainer.classList.remove('active');
-        if (loginContainer) loginContainer.classList.add('active');
-        return;
-    }
+    // Show LOGIN by default when logged out
+    if (signupContainer) signupContainer.classList.remove("active");
+    if (loginContainer) loginContainer.classList.add("active");
+    return;
+  }
 
-    // USER IS LOGGED IN
-    localStorage.setItem('isLoggedIn', 'true');
-    body.classList.add('logged-in');
+  // USER IS LOGGED IN
+  localStorage.setItem("isLoggedIn", "true");
+  body.classList.add("logged-in");
 
-    if (loginContainer) loginContainer.classList.remove('active');
-    if (signupContainer) signupContainer.classList.remove('active');
+  if (loginContainer) loginContainer.classList.remove("active");
+  if (signupContainer) signupContainer.classList.remove("active");
 
-    // Show bottom navigation bar
-    const bottomNav = document.getElementById("bottomNav");
-    if (bottomNav) bottomNav.style.display = "flex";
+  // Show bottom navigation bar
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "flex";
 
-    // Stay on the page they were on
-    const currentSavedPage = localStorage.getItem('lastPage') || 'dashboard';
-    const pageToDisplay = document.getElementById(currentSavedPage);
-    if (pageToDisplay) pageToDisplay.style.display = 'block';
+  // Stay on the page they were on
+  const currentSavedPage = localStorage.getItem("lastPage") || "dashboard";
+  const pageToDisplay = document.getElementById(currentSavedPage);
+  if (pageToDisplay) pageToDisplay.style.display = "block";
 
-    if (isAppInitialized) return;
+  if (isAppInitialized) return;
 
-    console.log("Initializing user data...");
-    afterLogin();
+  console.log("Initializing user data...");
+  afterLogin();
 
-    await loadBalance();
-    startAutoClaim();
-   
+  await loadBalance();
+  startAutoClaim();
 
-    isAppInitialized = true;
+  isAppInitialized = true;
 });
 
 // ======================================================
 // POPUP FUNCTION
 // ======================================================
 function showWelcomePopup() {
-    const welcomePopup = document.getElementById('welcomePopup');
-    if (welcomePopup) {
-        welcomePopup.style.display = 'flex';
-    }
+  const welcomePopup = document.getElementById("welcomePopup");
+  if (welcomePopup) {
+    welcomePopup.style.display = "flex";
+  }
 }
 
 // ======================================================
 // POST-LOGIN
 // ======================================================
 function afterLogin() {
-    showWelcomePopup();
+  showWelcomePopup();
 }
 
 // ======================================================
 // SHOW / HIDE AUTH FORMS
 // ======================================================
 function showSignup() {
-    document.getElementById("loginContainer").classList.remove("active");
-    document.getElementById("signupContainer").classList.add("active");
+  document.getElementById("loginContainer").classList.remove("active");
+  document.getElementById("signupContainer").classList.add("active");
 }
 
 function showLogin() {
-    document.getElementById("signupContainer").classList.remove("active");
-    document.getElementById("loginContainer").classList.add("active");
+  document.getElementById("signupContainer").classList.remove("active");
+  document.getElementById("loginContainer").classList.add("active");
 }
 
 window.showLogin = showLogin;
@@ -389,21 +392,21 @@ window.showSignup = showSignup;
 // ======================================================
 // PASSWORD EYE TOGGLE
 // ======================================================
-document.querySelectorAll('.eye-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const inputId = btn.getAttribute('data-target');
+document.querySelectorAll(".eye-toggle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const inputId = btn.getAttribute("data-target");
     const input = document.getElementById(inputId);
-    const icon = btn.querySelector('i');
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.classList.remove('fa-eye-slash');
-      icon.classList.add('fa-eye');
-      btn.classList.add('active');
+    const icon = btn.querySelector("i");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+      btn.classList.add("active");
     } else {
-      input.type = 'password';
-      icon.classList.remove('fa-eye');
-      icon.classList.add('fa-eye-slash');
-      btn.classList.remove('active');
+      input.type = "password";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+      btn.classList.remove("active");
     }
   });
 });
@@ -411,40 +414,39 @@ document.querySelectorAll('.eye-toggle').forEach(btn => {
 // ======================================================
 // PROFILE
 // ======================================================
-window.openProfile = function() {
-    console.log("Profile clicked!");
-    const profileModal = document.getElementById("profileModal");
-    if (profileModal) profileModal.style.display = "block";
+window.openProfile = function () {
+  console.log("Profile clicked!");
+  const profileModal = document.getElementById("profileModal");
+  if (profileModal) profileModal.style.display = "block";
 };
 
 function showAlert(message) {
-  const alertBox = document.getElementById('customAlert');
+  const alertBox = document.getElementById("customAlert");
   alertBox.textContent = message;
-  alertBox.style.opacity = '1';
-  alertBox.style.transform = 'translateY(0)';
+  alertBox.style.opacity = "1";
+  alertBox.style.transform = "translateY(0)";
 
   // Hide after 3 seconds
   setTimeout(() => {
-    alertBox.style.opacity = '0';
-    alertBox.style.transform = 'translateY(-20px)';
+    alertBox.style.opacity = "0";
+    alertBox.style.transform = "translateY(-20px)";
   }, 3000);
 }
 
-
 function showLoader(options) {
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+  const loader = document.getElementById("pageLoader");
+  loader.style.display = "flex";
+  loader.style.opacity = "1";
 
   // options: { callback: function, url: string }
   const { callback, url } = options || {};
 
   setTimeout(() => {
-    loader.style.opacity = '0';
+    loader.style.opacity = "0";
     setTimeout(() => {
-      loader.style.display = 'none';
-      if (typeof callback === 'function') {
-        callback();  // run JS action (signup/login)
+      loader.style.display = "none";
+      if (typeof callback === "function") {
+        callback(); // run JS action (signup/login)
       } else if (url) {
         window.location.href = url; // redirect to page
       }
@@ -452,18 +454,17 @@ function showLoader(options) {
   }, 3000); // loader visible for 3 seconds
 }
 
-
 // Function to simulate page load
 function loadPage(url) {
-  const loader = document.getElementById('pageLoader');
-  loader.style.opacity = '1';
-  loader.style.display = 'flex';
+  const loader = document.getElementById("pageLoader");
+  loader.style.opacity = "1";
+  loader.style.display = "flex";
 
   // After 3 seconds, redirect or show content
   setTimeout(() => {
-    loader.style.opacity = '0';
-    setTimeout(() => { 
-      loader.style.display = 'none';
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
       // If real page redirect:
       window.location.href = url;
       // If single-page content, you can instead show/hide sections here
@@ -471,293 +472,301 @@ function loadPage(url) {
   }, 3000);
 }
 
-
 // Elements
-const signupContainer = document.getElementById('signupContainer');
-const loginContainer = document.getElementById('loginContainer');
-const dashboard = document.getElementById('dashboard');
-
+const signupContainer = document.getElementById("signupContainer");
+const loginContainer = document.getElementById("loginContainer");
+const dashboard = document.getElementById("dashboard");
 
 // Initial display
-signupContainer.classList.add('active');
-
-
-
+signupContainer.classList.add("active");
 
 // --- GLOBAL CONFIG & LOCKS ---
 const MS_IN_DAY = 20 * 60 * 60 * 1000; // 20-hour income cycle
 let isSyncingNow = false; // 🔒 The "Guard" that stops double drops
 
 // ====================== AUTO-FILL REFERRAL ======================
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.hash.substring(1));
-  const ref = urlParams.get('ref');
+  const ref = urlParams.get("ref");
   if (ref) {
-    const referralInput = document.getElementById('referral');
+    const referralInput = document.getElementById("referral");
     if (referralInput) referralInput.value = ref;
   }
 });
 
-
 // ====================== SIGNUP ======================
-document.getElementById('signupForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+document
+  .getElementById("signupForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+    const loader = document.getElementById("pageLoader");
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
 
-  const number = document.getElementById('number').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const confirmPassword = document.getElementById('confirmPassword').value.trim();
-  const referral = document.getElementById('referral').value.trim();
+    const number = document.getElementById("number").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document
+      .getElementById("confirmPassword")
+      .value.trim();
+    const referral = document.getElementById("referral").value.trim();
 
-  if (!number || !password || !confirmPassword) {
-    loader.style.display = 'none';
-    window.showToast('Validation Failed: All fields are required!', 'error');
-    return;
-}
+    if (!number || !password || !confirmPassword) {
+      loader.style.display = "none";
+      window.showToast("Validation Failed: All fields are required!", "error");
+      return;
+    }
 
-if (password !== confirmPassword) {
-    loader.style.display = 'none';
-    window.showToast('Validation Failed: Passwords do not match!', 'error');
-    return;
-}
-  try {
-    const fakeEmail = `${number}@user.com`;
+    if (password !== confirmPassword) {
+      loader.style.display = "none";
+      window.showToast("Validation Failed: Passwords do not match!", "error");
+      return;
+    }
+    try {
+      const fakeEmail = `${number}@user.com`;
 
-    // 1️⃣ Create auth user
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      fakeEmail,
-      password
-    );
-    const user = userCredential.user;
-
-    // 2️⃣ Generate referral ID
-    const referralId =
-      Array.from({ length: 3 }, () =>
-        String.fromCharCode(65 + Math.floor(Math.random() * 26))
-      ).join('') + Math.floor(100 + Math.random() * 900);
-
-    // 3️⃣ Resolve referrer
-    let referrerId = "";
-    let grandReferrerId = "";
-
-    if (referral) {
-      const refQuery = query(
-        collection(db, "users"),
-        where("referralId", "==", referral)
+      // 1️⃣ Create auth user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        fakeEmail,
+        password,
       );
-      const refSnap = await getDocs(refQuery);
+      const user = userCredential.user;
 
-      if (!refSnap.empty) {
-        referrerId = refSnap.docs[0].id;
-        grandReferrerId = refSnap.docs[0].data().referrerId || "";
-      }
-    }
+      // 2️⃣ Generate referral ID
+      const referralId =
+        Array.from({ length: 3 }, () =>
+          String.fromCharCode(65 + Math.floor(Math.random() * 26)),
+        ).join("") + Math.floor(100 + Math.random() * 900);
 
-   // --- Step 4.0: Get the Bonus you set in Admin Panel ---
-let dynamicBonus = 500; // This is only the backup if the DB fails
-try {
-    // CHANGE THIS LINE to match your Admin Panel path
-    const adminSnap = await getDoc(doc(db, "adminSettings", "globals")); 
-    
-    if (adminSnap.exists()) {
-        // Use the value from your Admin Panel
-        const cloudBonus = adminSnap.data().welcomeBonus;
-        
-        // If there is a value in the cloud, use it. Otherwise, stay at 700.
-        if (cloudBonus !== undefined && cloudBonus !== null) {
-            dynamicBonus = Number(cloudBonus);
+      // 3️⃣ Resolve referrer
+      let referrerId = "";
+      let grandReferrerId = "";
+
+      if (referral) {
+        const refQuery = query(
+          collection(db, "users"),
+          where("referralId", "==", referral),
+        );
+        const refSnap = await getDocs(refQuery);
+
+        if (!refSnap.empty) {
+          referrerId = refSnap.docs[0].id;
+          grandReferrerId = refSnap.docs[0].data().referrerId || "";
         }
-    }
-} catch (e) {
-    console.error("Error fetching admin bonus:", e);
-}
+      }
 
-// --- Step 4.1: Create Firestore user document ---
-await setDoc(doc(db, "users", user.uid), {
-    uid: user.uid,
-    number,
-    referral: referral || "",
-    referralId,
-    referrerId,
+      // --- Step 4.0: Get the Bonus you set in Admin Panel ---
+      let dynamicBonus = 500; // This is only the backup if the DB fails
+      try {
+        // CHANGE THIS LINE to match your Admin Panel path
+        const adminSnap = await getDoc(doc(db, "adminSettings", "globals"));
 
-    // USE THE DYNAMIC BONUS HERE
-    balance: dynamicBonus, 
-    bonus: dynamicBonus,
+        if (adminSnap.exists()) {
+          // Use the value from your Admin Panel
+          const cloudBonus = adminSnap.data().welcomeBonus;
 
-    createdAt: new Date(),
-    banned: false,
+          // If there is a value in the cloud, use it. Otherwise, stay at 700.
+          if (cloudBonus !== undefined && cloudBonus !== null) {
+            dynamicBonus = Number(cloudBonus);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching admin bonus:", e);
+      }
 
-    referrals: {
-        level1: [],
-        level2: []
-    },
+      // --- Step 4.1: Create Firestore user document ---
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        number,
+        referral: referral || "",
+        referralId,
+        referrerId,
 
-    trackedInvestments: [],
-    totalCommission: 0,
-    availableCommissionLevel1: 0,
-    availableCommissionLevel2: 0
-});
+        // USE THE DYNAMIC BONUS HERE
+        balance: dynamicBonus,
+        bonus: dynamicBonus,
 
+        createdAt: new Date(),
+        banned: false,
 
-// --- Step 4.2: UPDATE GLOBAL USER STATS (QUOTA SAVER) ---
-try {
-    await setDoc(doc(db, "adminSettings", "stats"), {
-        totalUsers: increment(1)
-    }, { merge: true });
-    console.log("Global user count incremented.");
-} catch (statsErr) {
-    console.error("Failed to update global user count:", statsErr);
-    // We don't stop the signup even if the stats update fails
-}
+        referrals: {
+          level1: [],
+          level2: [],
+        },
 
-
-    // 5️⃣ Update referrer records
-    if (referrerId) {
-      await updateDoc(doc(db, "users", referrerId), {
-        "referrals.level1": arrayUnion({
-          uid: user.uid,
-          number,
-          createdAt: new Date()
-        })
+        trackedInvestments: [],
+        totalCommission: 0,
+        availableCommissionLevel1: 0,
+        availableCommissionLevel2: 0,
       });
 
-      if (grandReferrerId) {
-        await updateDoc(doc(db, "users", grandReferrerId), {
-          "referrals.level2": arrayUnion({
+      // --- Step 4.2: UPDATE GLOBAL USER STATS (QUOTA SAVER) ---
+      try {
+        await setDoc(
+          doc(db, "adminSettings", "stats"),
+          {
+            totalUsers: increment(1),
+          },
+          { merge: true },
+        );
+        console.log("Global user count incremented.");
+      } catch (statsErr) {
+        console.error("Failed to update global user count:", statsErr);
+        // We don't stop the signup even if the stats update fails
+      }
+
+      // 5️⃣ Update referrer records
+      if (referrerId) {
+        await updateDoc(doc(db, "users", referrerId), {
+          "referrals.level1": arrayUnion({
             uid: user.uid,
             number,
-            createdAt: new Date()
-          })
+            createdAt: new Date(),
+          }),
         });
+
+        if (grandReferrerId) {
+          await updateDoc(doc(db, "users", grandReferrerId), {
+            "referrals.level2": arrayUnion({
+              uid: user.uid,
+              number,
+              createdAt: new Date(),
+            }),
+          });
+        }
       }
-    }
 
-    // ✅ Auto-login after signup
-window.showToast('Signup Successful: Logging you in...', 'success');
+      // ✅ Auto-login after signup
+      window.showToast("Signup Successful: Logging you in...", "success");
 
-// Optionally show dashboard immediately
-showDashboard();
-startInvestmentSystem(user.uid);
-} catch (err) {
-    console.error("Auth Error Code:", err.code);
+      // Optionally show dashboard immediately
+      showDashboard();
+      startInvestmentSystem(user.uid);
+    } catch (err) {
+      console.error("Auth Error Code:", err.code);
 
-    // Default message if we don't recognize the error
-    let cleanMessage = "An unexpected error occurred. Please try again.";
+      // Default message if we don't recognize the error
+      let cleanMessage = "An unexpected error occurred. Please try again.";
 
-    // 🛡️ CUSTOM CLEAN MESSAGES
-    if (err.code === 'auth/email-already-in-use') {
+      // 🛡️ CUSTOM CLEAN MESSAGES
+      if (err.code === "auth/email-already-in-use") {
         cleanMessage = "This mobile number is already registered.";
-    } else if (err.code === 'auth/invalid-email') {
+      } else if (err.code === "auth/invalid-email") {
         cleanMessage = "Invalid mobile number format.";
-    } else if (err.code === 'auth/weak-password') {
-        cleanMessage = "Password is too weak. Please use at least 6 characters.";
-    } else if (err.code === 'auth/network-request-failed') {
+      } else if (err.code === "auth/weak-password") {
+        cleanMessage =
+          "Password is too weak. Please use at least 6 characters.";
+      } else if (err.code === "auth/network-request-failed") {
         cleanMessage = "Network error. Please check your connection.";
-    } else if (err.code === 'auth/operation-not-allowed') {
+      } else if (err.code === "auth/operation-not-allowed") {
         cleanMessage = "Signup is currently disabled.";
+      }
+
+      window.showToast(`Signup Failed: ${cleanMessage}`, "error");
+    } finally {
+      // Hide the loader regardless of success or failure
+      loader.style.opacity = "0";
+      setTimeout(() => {
+        loader.style.display = "none";
+      }, 500);
     }
-
-   window.showToast(`Signup Failed: ${cleanMessage}`, 'error');
-
-} finally {
-    // Hide the loader regardless of success or failure
-    loader.style.opacity = '0';
-    setTimeout(() => {
-        loader.style.display = 'none';
-    }, 500);
-}
-});
+  });
 
 // ====================== LOGIN ======================
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+document
+  .getElementById("loginForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+    const loader = document.getElementById("pageLoader");
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
 
-  const loginNumber = document.getElementById('loginNumber').value.trim();
-  const loginPassword = document.getElementById('loginPassword').value.trim();
-  const fakeEmail = `${loginNumber}@user.com`;
+    const loginNumber = document.getElementById("loginNumber").value.trim();
+    const loginPassword = document.getElementById("loginPassword").value.trim();
+    const fakeEmail = `${loginNumber}@user.com`;
 
-  try {
-    // 1️⃣ Sign in user
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      fakeEmail,
-      loginPassword
-    );
-    const user = userCredential.user;
+    try {
+      // 1️⃣ Sign in user
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        fakeEmail,
+        loginPassword,
+      );
+      const user = userCredential.user;
 
-    // 2️⃣ Validate Firestore user
-    const userDocRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userDocRef);
+      // 2️⃣ Validate Firestore user
+      const userDocRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userDocRef);
 
-   if (!userSnap.exists()) {
-    await signOut(auth);
-    window.showToast('User Not Found: User record not found!', 'error');
-    return;
-}
+      if (!userSnap.exists()) {
+        await signOut(auth);
+        window.showToast("User Not Found: User record not found!", "error");
+        return;
+      }
 
-if (userSnap.data().banned) {
-    await signOut(auth);
-    window.showToast('Account Banned: Your account has been banned. Contact support.', 'error');
-    return;
-}
+      if (userSnap.data().banned) {
+        await signOut(auth);
+        window.showToast(
+          "Account Banned: Your account has been banned. Contact support.",
+          "error",
+        );
+        return;
+      }
 
-    // 3️⃣ Setup referral (safe, no UI)
-    setupReferral(user);
+      // 3️⃣ Setup referral (safe, no UI)
+      setupReferral(user);
 
-    // 4️⃣ Real-time banned watcher
-onSnapshot(userDocRef, (docSnap) => {
-  if (docSnap.exists() && docSnap.data().banned) {
-    window.showToast('Account Banned: Your account has been banned. Logging out...', 'error');
-    signOut(auth).then(() => window.location.reload());
-  }
-});
+      // 4️⃣ Real-time banned watcher
+      onSnapshot(userDocRef, (docSnap) => {
+        if (docSnap.exists() && docSnap.data().banned) {
+          window.showToast(
+            "Account Banned: Your account has been banned. Logging out...",
+            "error",
+          );
+          signOut(auth).then(() => window.location.reload());
+        }
+      });
 
- 
-    // Backfill old investment profits
-    await backfillInvestmentRecords(user.uid);
+      // Backfill old investment profits
+      await backfillInvestmentRecords(user.uid);
 
-    // ✅ Always land on Home (dashboard) after login, not the last visited page
-    localStorage.setItem('lastPage', 'dashboard');
+      // ✅ Always land on Home (dashboard) after login, not the last visited page
+      localStorage.setItem("lastPage", "dashboard");
 
-    // ❌ NO UI LOGIC HERE
-    // Auth state listener will handle dashboard & navbar
+      // ❌ NO UI LOGIC HERE
+      // Auth state listener will handle dashboard & navbar
+    } catch (error) {
+      console.error("Login Error Code:", error.code);
 
- } catch (error) {
-    console.error("Login Error Code:", error.code);
+      // ✅ PROFESSIONAL SECRECY: Don't tell them if it's the number or the password that is wrong.
+      // This stops people from "probing" your database to see who is registered.
+      let cleanMessage = "Invalid mobile number or password.";
 
-    // ✅ PROFESSIONAL SECRECY: Don't tell them if it's the number or the password that is wrong.
-    // This stops people from "probing" your database to see who is registered.
-    let cleanMessage = "Invalid mobile number or password.";
-
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/invalid-credential"
+      ) {
         cleanMessage = "Invalid mobile number or password.";
-    } else if (error.code === 'auth/user-disabled') {
-        cleanMessage = "This account has been suspended. Please contact support.";
-    } else if (error.code === 'auth/too-many-requests') {
+      } else if (error.code === "auth/user-disabled") {
+        cleanMessage =
+          "This account has been suspended. Please contact support.";
+      } else if (error.code === "auth/too-many-requests") {
         cleanMessage = "Too many failed attempts. Please try again later.";
-    } else if (error.code === 'auth/network-request-failed') {
+      } else if (error.code === "auth/network-request-failed") {
         cleanMessage = "Network error. Please check your internet connection.";
+      }
+
+      window.showToast(`Login Failed: ${cleanMessage}`, "error");
+    } finally {
+      loader.style.opacity = "0";
+      setTimeout(() => {
+        loader.style.display = "none";
+      }, 500);
     }
-
-    window.showToast(`Login Failed: ${cleanMessage}`, 'error');
-
-  } finally {
-    loader.style.opacity = '0';
-    setTimeout(() => {
-      loader.style.display = 'none';
-    }, 500);
-  }
-});
-
-
+  });
 
 // ======================================================
 // FETCH PRODUCTS (OPTIMIZED FOR LOW QUOTA)
@@ -767,16 +776,16 @@ async function listenToProducts() {
   if (!productContainer) return;
 
   // Use a loading state for a premium feel
-  productContainer.innerHTML = '<div class="mx-loader">Loading Plans...</div>'; 
+  productContainer.innerHTML = '<div class="mx-loader">Loading Plans...</div>';
 
   // ✅ Pointing to your secondary DB (transactionDb)
   const productsRef = collection(transactionDb, "products");
 
   try {
     // ✅ CHANGED: Use getDocs instead of onSnapshot to save reads & connections
-    const snapshot = await getDocs(productsRef); 
-    
-    productContainer.innerHTML = ""; 
+    const snapshot = await getDocs(productsRef);
+
+    productContainer.innerHTML = "";
     const productList = [];
 
     snapshot.forEach((docSnap) => {
@@ -785,16 +794,15 @@ async function listenToProducts() {
 
     // MASTER SORT: VIP 1 to 12
     productList.sort((a, b) => {
-      const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
-      const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+      const numA = parseInt(a.id.replace(/\D/g, "")) || 0;
+      const numB = parseInt(b.id.replace(/\D/g, "")) || 0;
       return numA - numB;
     });
 
     // Render sorted list
     productList.forEach((p) => {
-      if (p.locked) return; 
+      if (p.locked) return;
 
-    
       const cardHtml = `
   <div class="mx-product-card">
 
@@ -866,7 +874,8 @@ async function listenToProducts() {
     });
   } catch (error) {
     console.error("Error fetching products:", error);
-    productContainer.innerHTML = '<div class="mx-error">Failed to load products. Please refresh.</div>';
+    productContainer.innerHTML =
+      '<div class="mx-error">Failed to load products. Please refresh.</div>';
   }
 }
 
@@ -886,15 +895,10 @@ auth.onAuthStateChanged(async (user) => {
       const data = userSnap.data();
       bonus = data.bonus || 0;
     }
-
-    
-
   } catch (error) {
     console.error("Error fetching user bonus:", error);
-   
   }
 });
-
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
@@ -906,13 +910,10 @@ auth.onAuthStateChanged(async (user) => {
   document.getElementById("userBalance").textContent = balance.toLocaleString();
 });
 
-
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    
   }
 });
-
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
@@ -935,14 +936,13 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-
 function logout() {
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+  const loader = document.getElementById("pageLoader");
+  loader.style.display = "flex";
+  loader.style.opacity = "1";
 
   // Reset lastPage state on logout
-  localStorage.setItem('lastPage', 'dashboard');
+  localStorage.setItem("lastPage", "dashboard");
 
   setTimeout(async () => {
     try {
@@ -961,37 +961,34 @@ function logout() {
     showLogin();
 
     // Hide loader
-    loader.style.opacity = '0';
-    setTimeout(() => { loader.style.display = 'none'; }, 500);
-
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 500);
   }, 500); // small delay so loader appears
 }
 
 // Make it global
 window.logout = logout;
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const giftCodeBtn = document.getElementById("giftCodeBtn");
 
   giftCodeBtn.addEventListener("click", async () => {
-
     const loader = document.getElementById("dailyLoader");
     loader.style.display = "flex";
 
     const user = auth.currentUser;
-  
+
     if (!user) {
-    loader.style.display = "none";
-    window.showToast('Please Login: You must be logged in!', 'warning');
-    return;
-}
+      loader.style.display = "none";
+      window.showToast("Please Login: You must be logged in!", "warning");
+      return;
+    }
 
     const userRef = doc(db, "users", user.uid);
 
     try {
-
       const today = new Date().toISOString().split("T")[0];
 
       const userSnap = await getDoc(userRef);
@@ -1003,31 +1000,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const userData = userSnap.data();
 
       // Check active investment
-      const hasActiveInvestment = Array.isArray(userData.investments) &&
-        userData.investments.some(inv => inv.status === "active");
+      const hasActiveInvestment =
+        Array.isArray(userData.investments) &&
+        userData.investments.some((inv) => inv.status === "active");
 
-     if (!hasActiveInvestment) {
-    loader.style.display = "none";
-    window.showToast('Need to Purchase a Product: Please purchase a product to continue.', 'warning');
-    return;
-}
+      if (!hasActiveInvestment) {
+        loader.style.display = "none";
+        window.showToast(
+          "Need to Purchase a Product: Please purchase a product to continue.",
+          "warning",
+        );
+        return;
+      }
 
       // Already claimed
-if (userData.lastDailyClaim === today) {
-  loader.style.display = "none";
+      if (userData.lastDailyClaim === today) {
+        loader.style.display = "none";
 
-  FintechNotify.info(
-    'Check-in completed',
-    'You’ve already checked in today. Come back tomorrow.'
-  );
+        FintechNotify.info(
+          "Check-in completed",
+          "You’ve already checked in today. Come back tomorrow.",
+        );
 
-  return;
-}
+        return;
+      }
       // Give bonus
       await updateDoc(userRef, {
         balance: increment(100),
         bonus: increment(100),
-        lastDailyClaim: today
+        lastDailyClaim: today,
       });
 
       // Save record
@@ -1035,7 +1036,7 @@ if (userData.lastDailyClaim === today) {
         type: "Daily Login",
         amount: 100,
         status: "Claimed",
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
       });
 
       // Update balance realtime
@@ -1049,15 +1050,15 @@ if (userData.lastDailyClaim === today) {
         });
       }
 
-     window.showToast('Daily Login Successful: 🎁 ₦100 added.', 'success');
-loader.style.display = "none";
-
+      window.showToast("Daily Login Successful: 🎁 ₦100 added.", "success");
+      loader.style.display = "none";
     } catch (err) {
-
       console.error("Daily login error:", err);
       loader.style.display = "none";
-    window.showToast('Failed to Claim Daily Reward: Please try again later.', 'error');
-
+      window.showToast(
+        "Failed to Claim Daily Reward: Please try again later.",
+        "error",
+      );
     }
   });
 });
@@ -1069,15 +1070,12 @@ async function updateBalance(amount) {
   const userRef = doc(db, "users", user.uid);
   try {
     await updateDoc(userRef, {
-      balance: increment(amount) // Firestore atomic increment
+      balance: increment(amount), // Firestore atomic increment
     });
   } catch (err) {
     console.error("Failed to update balance:", err);
   }
 }
-
-
-
 
 auth.onAuthStateChanged((user) => {
   if (!user) return;
@@ -1100,7 +1098,7 @@ auth.onAuthStateChanged((user) => {
       const commissionsCol = collection(userRef, "commissions");
       const commissionsSnap = await getDocs(commissionsCol);
       let totalCommission = 0;
-      commissionsSnap.forEach(doc => {
+      commissionsSnap.forEach((doc) => {
         const c = doc.data();
         totalCommission += c.amount || 0;
       });
@@ -1117,16 +1115,15 @@ auth.onAuthStateChanged((user) => {
   });
 });
 
-
 function openProfile() {
   // Hide all pages safely
   if (pages && pages.length) {
-    pages.forEach(page => {
-      if (page) page.style.display = 'none';
+    pages.forEach((page) => {
+      if (page) page.style.display = "none";
     });
   }
 
-  if (productPage) productPage.style.display = 'none';
+  if (productPage) productPage.style.display = "none";
 
   const profilePage = document.getElementById("profilePage");
   if (profilePage) profilePage.style.display = "block";
@@ -1138,11 +1135,10 @@ function openProfile() {
 // Make it global
 window.openProfile = openProfile;
 
-
 function showDashboard() {
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+  const loader = document.getElementById("pageLoader");
+  loader.style.display = "flex";
+  loader.style.opacity = "1";
 
   setTimeout(() => {
     // Hide other pages
@@ -1160,19 +1156,20 @@ function showDashboard() {
     showWelcomePopup();
 
     // Hide loader
-    loader.style.opacity = '0';
-    setTimeout(() => { loader.style.display = 'none'; }, 500);
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 500);
   }, 500); // small delay so loader is visible
 }
 
 // Make it global
 window.showDashboard = showDashboard;
 
-
 function backToProfile() {
-  const loader = document.getElementById('pageLoader');
-  loader.style.display = 'flex';
-  loader.style.opacity = '1';
+  const loader = document.getElementById("pageLoader");
+  loader.style.display = "flex";
+  loader.style.opacity = "1";
 
   setTimeout(() => {
     // Hide bank page
@@ -1184,151 +1181,173 @@ function backToProfile() {
     document.getElementById("bottomNav").style.display = "flex";
 
     // Hide loader
-    loader.style.opacity = '0';
-    setTimeout(() => { loader.style.display = 'none'; }, 500);
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 500);
   }, 500); // small delay so loader is visible
 }
 
 // Make it global
 window.backToProfile = backToProfile;
 
-
 // -------------------------------------------------------------------------
 // DYNAMIC BANK INFO FETCHING (Global Settings)
 // -------------------------------------------------------------------------
 async function fetchBankDetails() {
-    try {
-        const docRef = doc(db, "adminSettings", "settings");
-        const docSnap = await getDoc(docRef);
+  try {
+    const docRef = doc(db, "adminSettings", "settings");
+    const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            const data = docSnap.data().bankAccount;
-            if (document.getElementById('accNameDisplay')) document.getElementById('accNameDisplay').innerText = data.accountName;
-            if (document.getElementById('accNumDisplay')) document.getElementById('accNumDisplay').innerText = data.accountNumber;
-            if (document.getElementById('bankNameDisplay')) document.getElementById('bankNameDisplay').innerText = data.bankName;
-        }
-    } catch (error) {
-        console.error("Error fetching bank details:", error);
+    if (docSnap.exists()) {
+      const data = docSnap.data().bankAccount;
+      if (document.getElementById("accNameDisplay"))
+        document.getElementById("accNameDisplay").innerText = data.accountName;
+      if (document.getElementById("accNumDisplay"))
+        document.getElementById("accNumDisplay").innerText = data.accountNumber;
+      if (document.getElementById("bankNameDisplay"))
+        document.getElementById("bankNameDisplay").innerText = data.bankName;
     }
+  } catch (error) {
+    console.error("Error fetching bank details:", error);
+  }
 }
 window.onload = fetchBankDetails;
 
 // ----------------- Bank Navigation -----------------
 function openBankPage() {
-    const loader = document.getElementById('pageLoader');
+  const loader = document.getElementById("pageLoader");
+  if (loader) {
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
+  }
+  setTimeout(() => {
+    pages.forEach((page) => {
+      if (page) page.style.display = "none";
+    });
+    document.getElementById("bankPage").style.display = "block";
     if (loader) {
-        loader.style.display = 'flex';
-        loader.style.opacity = '1';
+      loader.style.opacity = "0";
+      setTimeout(() => (loader.style.display = "none"), 500);
     }
-    setTimeout(() => {
-        pages.forEach(page => { if (page) page.style.display = 'none'; });
-        document.getElementById('bankPage').style.display = 'block';
-        if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-        }
-    }, 300);
+  }, 300);
 }
 
-document.getElementById('bankAccountBtn')?.addEventListener('click', openBankPage);
-document.addEventListener('click', (e) => { if (e.target.id === 'addAccountBtn') openBankPage(); });
+document
+  .getElementById("bankAccountBtn")
+  ?.addEventListener("click", openBankPage);
+document.addEventListener("click", (e) => {
+  if (e.target.id === "addAccountBtn") openBankPage();
+});
 
 // ----------------- References & Variables -----------------
-const bankForm = document.getElementById('bankForm');
-const bankSuccess = document.getElementById('bankSuccess');
-const bankSelect = document.getElementById('bankName'); 
-const accNumInput = document.getElementById('accountNumber');
-const accNameInput = document.getElementById('accountName');
-const getSubmitBtn = () => bankForm?.querySelector('.honda-submit-btn') || bankForm?.querySelector('button[type="submit"]');
+const bankForm = document.getElementById("bankForm");
+const bankSuccess = document.getElementById("bankSuccess");
+const bankSelect = document.getElementById("bankName");
+const accNumInput = document.getElementById("accountNumber");
+const accNameInput = document.getElementById("accountName");
+const getSubmitBtn = () =>
+  bankForm?.querySelector(".honda-submit-btn") ||
+  bankForm?.querySelector('button[type="submit"]');
 
 // ----------------- Auth Listener (Real-time Sync) -----------------
 auth.onAuthStateChanged((user) => {
-    if (!user) return;
-    const userRef = doc(db, "users", user.uid);
+  if (!user) return;
+  const userRef = doc(db, "users", user.uid);
 
-    onSnapshot(userRef, (snap) => {
-        const bank = snap.data()?.bankAccount;
-        const displayCard = document.getElementById("bankDetailsDisplay");
-        const addAccountBtn = document.getElementById("addAccountBtn");
+  onSnapshot(userRef, (snap) => {
+    const bank = snap.data()?.bankAccount;
+    const displayCard = document.getElementById("bankDetailsDisplay");
+    const addAccountBtn = document.getElementById("addAccountBtn");
 
-        if (bank) {
-            if (displayCard) displayCard.style.display = "block";
-            if (addAccountBtn) addAccountBtn.style.display = "none";
-            
-            // Populate form fields (Fields remain enabled/editable)
-            if (accNumInput) accNumInput.value = bank.accountNumber || "";
-            if (accNameInput) accNameInput.value = bank.accountName || "";
-            if (bankSelect) bankSelect.value = bank.bankCode || "";
-            
-            if (bankSuccess) {
-                bankSuccess.style.display = 'block';
-                bankSuccess.textContent = "Bank info saved ✅";
-            }
-        } else {
-            if (displayCard) displayCard.style.display = "none";
-            if (addAccountBtn) addAccountBtn.style.display = "block";
-        }
-    });
+    if (bank) {
+      if (displayCard) displayCard.style.display = "block";
+      if (addAccountBtn) addAccountBtn.style.display = "none";
+
+      // Populate form fields (Fields remain enabled/editable)
+      if (accNumInput) accNumInput.value = bank.accountNumber || "";
+      if (accNameInput) accNameInput.value = bank.accountName || "";
+      if (bankSelect) bankSelect.value = bank.bankCode || "";
+
+      if (bankSuccess) {
+        bankSuccess.style.display = "block";
+        bankSuccess.textContent = "Bank info saved ✅";
+      }
+    } else {
+      if (displayCard) displayCard.style.display = "none";
+      if (addAccountBtn) addAccountBtn.style.display = "block";
+    }
+  });
 });
 
 // ----------------- Submission Logic -----------------
-bankForm?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const submitBtn = getSubmitBtn();
-    const originalBtnText = submitBtn?.innerText || "Save";
+bankForm?.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const submitBtn = getSubmitBtn();
+  const originalBtnText = submitBtn?.innerText || "Save";
 
-    if (!bankSelect?.value || accNumInput?.value.trim().length !== 10 || !accNameInput?.value.trim()) {
-        return window.showToast('Please fill all fields correctly.', 'warning');
-    }
-    
-    if (submitBtn) { submitBtn.innerText = "Saving..."; submitBtn.disabled = true; }
+  if (
+    !bankSelect?.value ||
+    accNumInput?.value.trim().length !== 10 ||
+    !accNameInput?.value.trim()
+  ) {
+    return window.showToast("Please fill all fields correctly.", "warning");
+  }
 
-    try {
-        await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-            bankAccount: { 
-                bankName: bankSelect.options[bankSelect.selectedIndex].text,
-                bankCode: bankSelect.value,
-                accountNumber: accNumInput.value.trim(), 
-                accountName: accNameInput.value.trim() 
-            } 
-        });
-        window.showToast('Bank Account Saved Successfully!', 'success');
-    } catch (err) {
-        window.showToast('Failed to save. Check connection.', 'error');
-    } finally {
-        if (submitBtn) { submitBtn.innerText = originalBtnText; submitBtn.disabled = false; }
+  if (submitBtn) {
+    submitBtn.innerText = "Saving...";
+    submitBtn.disabled = true;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+      bankAccount: {
+        bankName: bankSelect.options[bankSelect.selectedIndex].text,
+        bankCode: bankSelect.value,
+        accountNumber: accNumInput.value.trim(),
+        accountName: accNameInput.value.trim(),
+      },
+    });
+    window.showToast("Bank Account Saved Successfully!", "success");
+  } catch (err) {
+    window.showToast("Failed to save. Check connection.", "error");
+  } finally {
+    if (submitBtn) {
+      submitBtn.innerText = originalBtnText;
+      submitBtn.disabled = false;
     }
+  }
 });
 
-
-document.getElementById('homeNav')?.addEventListener('click', (e) => { e.preventDefault(); showDashboard(); });
-
+document.getElementById("homeNav")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  showDashboard();
+});
 
 // Select elements
 // We changed this from .withdraw-max to #withdrawMaxBtn
-const maxBtn = document.getElementById('withdrawMaxBtn'); 
-const balanceEl = document.getElementById('withdrawBalance');
-const inputEl = document.getElementById('withdrawAmountInput');
+const maxBtn = document.getElementById("withdrawMaxBtn");
+const balanceEl = document.getElementById("withdrawBalance");
+const inputEl = document.getElementById("withdrawAmountInput");
 
 // Add a safety check so it doesn't crash if the button is missing
 if (maxBtn && balanceEl && inputEl) {
-    maxBtn.addEventListener('click', () => {
-        // Get balance text (e.g. "₦12,500")
-        let balanceText = balanceEl.textContent;
+  maxBtn.addEventListener("click", () => {
+    // Get balance text (e.g. "₦12,500")
+    let balanceText = balanceEl.textContent;
 
-        // Remove currency symbol and commas
-        let cleanBalance = balanceText.replace(/[₦,]/g, '').trim();
+    // Remove currency symbol and commas
+    let cleanBalance = balanceText.replace(/[₦,]/g, "").trim();
 
-        // Set it into input
-        inputEl.value = cleanBalance;
-    });
+    // Set it into input
+    inputEl.value = cleanBalance;
+  });
 } else {
-    console.log("Withdrawal elements not found on this page.");
+  console.log("Withdrawal elements not found on this page.");
 }
 // Elements
-const dailyChip = document.getElementById('dailyChip');
-const dailyLabel = document.getElementById('dailyLabel');
-
+const dailyChip = document.getElementById("dailyChip");
+const dailyLabel = document.getElementById("dailyLabel");
 
 const dailyReward = 100;
 
@@ -1337,7 +1356,7 @@ async function loadBalance() {
   if (!user) return;
 
   // We connect the variable to the ID in your HTML
-  balanceAmount = document.getElementById('withdrawBalance'); 
+  balanceAmount = document.getElementById("withdrawBalance");
 
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
@@ -1351,345 +1370,347 @@ async function loadBalance() {
   }
 }
 
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
-   let selectedMethod = "automatic"; // Default state
+  let selectedMethod = "automatic"; // Default state
   // 1. DOM Elements
   const paymentMethodPage = document.getElementById("paymentMethodPage");
   const rechargePage = document.getElementById("rechargePage");
   const bottomNav = document.getElementById("bottomNav");
   const dashboard = document.getElementById("dashboard");
-  
+
   // Buttons that start the process from the dashboard
-  const rechargeTriggers = document.querySelectorAll('.qa-btn.recharge, #mainRechargeTrigger, .action-btn#depositBtn');
-  
+  const rechargeTriggers = document.querySelectorAll(
+    ".qa-btn.recharge, #mainRechargeTrigger, .action-btn#depositBtn",
+  );
+
   const proceedToRecharge = document.getElementById("proceedToRecharge");
   const methodBackBtn = document.getElementById("methodBackBtn");
   const rechargeBackBtn = document.getElementById("rechargeBackBtn");
 
-  
   // 1. OPEN RECHARGE PAGE DIRECTLY (Bypassing Method Selection)
-rechargeTriggers.forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (!rechargePage) return;
+  rechargeTriggers.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!rechargePage) return;
 
-    // We force the variable to manual globally
-    selectedMethod = "manual"; 
+      // We force the variable to manual globally
+      selectedMethod = "manual";
 
-    if (typeof showLoader === 'function') {
-      showLoader({
-        callback: () => {
-          if (typeof pages !== 'undefined') {
-            pages.forEach(p => { if (p) p.style.display = 'none'; });
-          }
-          if (dashboard) dashboard.style.display = 'none';
-          if (bottomNav) bottomNav.style.display = 'none';
-          
-          rechargePage.style.display = 'block';
-        }
-      });
-    } else {
-      rechargePage.style.display = 'block';
-    }
-  });
-});
+      if (typeof showLoader === "function") {
+        showLoader({
+          callback: () => {
+            if (typeof pages !== "undefined") {
+              pages.forEach((p) => {
+                if (p) p.style.display = "none";
+              });
+            }
+            if (dashboard) dashboard.style.display = "none";
+            if (bottomNav) bottomNav.style.display = "none";
 
-// 2. BACK BUTTONS
-if (rechargeBackBtn) {
-  rechargeBackBtn.addEventListener('click', () => {
-    rechargePage.style.display = 'none';
-    if (dashboard) dashboard.style.display = 'block';
-    if (bottomNav) bottomNav.style.display = 'flex';
-  });
-}
-
-if (methodBackBtn2) {
-  methodBackBtn2.addEventListener('click', () => {
-    manualDetailsPage.style.display = 'none';
-    rechargePage.style.display = 'block';
-  });
-}
-
-// 3. AMOUNT SELECTION & MANUAL REDIRECTION
-if (rechargePage) {
-  const amountOptions = rechargePage.querySelectorAll('.amount-option');
-  const customInput = rechargePage.querySelector('#customAmount');
-  const depositBtn = rechargePage.querySelector('#depositBtn');
-
-  amountOptions.forEach(option => {
-    option.addEventListener('click', function () {
-      amountOptions.forEach(opt => opt.classList.remove('active'));
-      this.classList.add('active');
-      if (customInput) customInput.value = this.dataset.value;
+            rechargePage.style.display = "block";
+          },
+        });
+      } else {
+        rechargePage.style.display = "block";
+      }
     });
   });
 
-  if (depositBtn) {
-    depositBtn.innerText = "Proceed to Transfer";
-    depositBtn.addEventListener('click', async () => {
-      if (!customInput) return;
-
-      const amount = Number(customInput.value);
-      const user = auth?.currentUser;
-
-      if (!user) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Authentication Required',
-          html: `<p style="opacity:.8">Please login to continue</p>`,
-          background: 'rgba(20,20,25,0.95)',
-          color: '#fff',
-          confirmButtonColor: '#007bff'
-        });
-        return;
-      }
-
-      if (!amount || amount < 1000) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Minimum Recharge Not Met',
-          html: `<p style="opacity:.8">Minimum recharge is ₦1,000</p>`,
-          background: 'rgba(20,20,25,0.95)',
-          color: '#fff',
-          confirmButtonColor: '#007bff'
-        });
-        return;
-      }
-
-      document.getElementById("displayManualAmount").innerText = `₦${amount.toLocaleString()}`;
-      rechargePage.style.display = 'none';
-      document.getElementById("manualDetailsPage").style.display = 'block';
+  // 2. BACK BUTTONS
+  if (rechargeBackBtn) {
+    rechargeBackBtn.addEventListener("click", () => {
+      rechargePage.style.display = "none";
+      if (dashboard) dashboard.style.display = "block";
+      if (bottomNav) bottomNav.style.display = "flex";
     });
   }
-}
 
-// ================= STEP PAGE TRANSITIONING HANDLERS =================
-const goToSenderDetailsBtn = document.getElementById("goToSenderDetailsBtn");
-const senderBackToBankBtn = document.getElementById("senderBackToBankBtn");
-const senderCancelBtn = document.getElementById("senderCancelBtn");
-const manualDetailsPageEl = document.getElementById("manualDetailsPage");
-const senderDetailsPageEl = document.getElementById("senderDetailsPage");
+  if (methodBackBtn2) {
+    methodBackBtn2.addEventListener("click", () => {
+      manualDetailsPage.style.display = "none";
+      rechargePage.style.display = "block";
+    });
+  }
 
-if (goToSenderDetailsBtn) {
-  goToSenderDetailsBtn.addEventListener('click', () => {
-    manualDetailsPageEl.style.display = 'none';
-    senderDetailsPageEl.style.display = 'block';
-  });
-}
+  // 3. AMOUNT SELECTION & MANUAL REDIRECTION
+  if (rechargePage) {
+    const amountOptions = rechargePage.querySelectorAll(".amount-option");
+    const customInput = rechargePage.querySelector("#customAmount");
+    const depositBtn = rechargePage.querySelector("#depositBtn");
 
-const returnToBankDetailsView = () => {
-  senderDetailsPageEl.style.display = 'none';
-  manualDetailsPageEl.style.display = 'block';
-};
-
-if (senderBackToBankBtn) senderBackToBankBtn.addEventListener('click', returnToBankDetailsView);
-if (senderCancelBtn) senderCancelBtn.addEventListener('click', returnToBankDetailsView);
-
-
-// 4. FINAL MANUAL SUBMISSION (To Transaction Database)
-const finalManualSubmit = document.getElementById("finalManualSubmit");
-
-if (finalManualSubmit) {
-  finalManualSubmit.addEventListener('click', async () => {
-    const user = auth?.currentUser;
-    const amount = Number(document.getElementById("customAmount").value);
-    const senderName = document.getElementById("senderName").value.trim();
-    const senderBank = document.getElementById("senderBank").value.trim();
-
-    if (!user) return;
-    if (!senderName || !senderBank) {
-      Swal.fire({ 
-        icon: 'warning', 
-        title: 'Missing Info', 
-        text: 'Please provide your sender name and bank for confirmation.',
-        background: '#1c2333',
-        color: '#fff',
-        confirmButtonColor: '#10b981'
+    amountOptions.forEach((option) => {
+      option.addEventListener("click", function () {
+        amountOptions.forEach((opt) => opt.classList.remove("active"));
+        this.classList.add("active");
+        if (customInput) customInput.value = this.dataset.value;
       });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Submitting Request',
-      html: '<p style="color:#676d7d;font-size:14px;">Sending your transfer details to admin...</p>',
-      background: '#1c2333',
-      color: '#fff',
-      allowOutsideClick: false,
-      didOpen: () => { Swal.showLoading(); }
     });
 
-    try {
-      let userPhoneNumber = localStorage.getItem("u_phone") || "N/A";
-      if (userPhoneNumber === "N/A") {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          userPhoneNumber = userDoc.data().number || "N/A";
-          localStorage.setItem("u_phone", userPhoneNumber);
+    if (depositBtn) {
+      depositBtn.innerText = "Proceed to Transfer";
+      depositBtn.addEventListener("click", async () => {
+        if (!customInput) return;
+
+        const amount = Number(customInput.value);
+        const user = auth?.currentUser;
+
+        if (!user) {
+          Swal.fire({
+            icon: "warning",
+            title: "Authentication Required",
+            html: `<p style="opacity:.8">Please login to continue</p>`,
+            background: "rgba(20,20,25,0.95)",
+            color: "#fff",
+            confirmButtonColor: "#007bff",
+          });
+          return;
         }
+
+        if (!amount || amount < 1000) {
+          Swal.fire({
+            icon: "warning",
+            title: "Minimum Recharge Not Met",
+            html: `<p style="opacity:.8">Minimum recharge is ₦1,000</p>`,
+            background: "rgba(20,20,25,0.95)",
+            color: "#fff",
+            confirmButtonColor: "#007bff",
+          });
+          return;
+        }
+
+        document.getElementById("displayManualAmount").innerText =
+          `₦${amount.toLocaleString()}`;
+        rechargePage.style.display = "none";
+        document.getElementById("manualDetailsPage").style.display = "block";
+      });
+    }
+  }
+
+  // ================= STEP PAGE TRANSITIONING HANDLERS =================
+  const goToSenderDetailsBtn = document.getElementById("goToSenderDetailsBtn");
+  const senderBackToBankBtn = document.getElementById("senderBackToBankBtn");
+  const senderCancelBtn = document.getElementById("senderCancelBtn");
+  const manualDetailsPageEl = document.getElementById("manualDetailsPage");
+  const senderDetailsPageEl = document.getElementById("senderDetailsPage");
+
+  if (goToSenderDetailsBtn) {
+    goToSenderDetailsBtn.addEventListener("click", () => {
+      manualDetailsPageEl.style.display = "none";
+      senderDetailsPageEl.style.display = "block";
+    });
+  }
+
+  const returnToBankDetailsView = () => {
+    senderDetailsPageEl.style.display = "none";
+    manualDetailsPageEl.style.display = "block";
+  };
+
+  if (senderBackToBankBtn)
+    senderBackToBankBtn.addEventListener("click", returnToBankDetailsView);
+  if (senderCancelBtn)
+    senderCancelBtn.addEventListener("click", returnToBankDetailsView);
+
+  // 4. FINAL MANUAL SUBMISSION (To Transaction Database)
+  const finalManualSubmit = document.getElementById("finalManualSubmit");
+
+  if (finalManualSubmit) {
+    finalManualSubmit.addEventListener("click", async () => {
+      const user = auth?.currentUser;
+      const amount = Number(document.getElementById("customAmount").value);
+      const senderName = document.getElementById("senderName").value.trim();
+      const senderBank = document.getElementById("senderBank").value.trim();
+
+      if (!user) return;
+      if (!senderName || !senderBank) {
+        Swal.fire({
+          icon: "warning",
+          title: "Missing Info",
+          text: "Please provide your sender name and bank for confirmation.",
+          background: "#1c2333",
+          color: "#fff",
+          confirmButtonColor: "#10b981",
+        });
+        return;
       }
 
-      // Optional field value collection check for database logging tracking
-      const senderAccNumEl = document.getElementById("senderAccountNumber");
-      const senderAccNumValue = senderAccNumEl ? senderAccNumEl.value.trim() : "N/A";
-
-      await addDoc(collection(transactionDb, "manualDeposits"), {
-        uid: user.uid,
-        userEmail: user.email || "N/A",
-        userPhone: userPhoneNumber,
-        amount: amount,
-        senderName: senderName, 
-        senderBank: senderBank, 
-        senderAccountNo: senderAccNumValue,
-        status: "pending",
-        method: "Manual Bank Transfer",
-        timestamp: serverTimestamp(),
-        dateString: new Date().toLocaleString() 
+      Swal.fire({
+        title: "Submitting Request",
+        html: '<p style="color:#676d7d;font-size:14px;">Sending your transfer details to admin...</p>',
+        background: "#1c2333",
+        color: "#fff",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
       });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Request Received',
-        html: `
+      try {
+        let userPhoneNumber = localStorage.getItem("u_phone") || "N/A";
+        if (userPhoneNumber === "N/A") {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            userPhoneNumber = userDoc.data().number || "N/A";
+            localStorage.setItem("u_phone", userPhoneNumber);
+          }
+        }
+
+        // Optional field value collection check for database logging tracking
+        const senderAccNumEl = document.getElementById("senderAccountNumber");
+        const senderAccNumValue = senderAccNumEl
+          ? senderAccNumEl.value.trim()
+          : "N/A";
+
+        await addDoc(collection(transactionDb, "manualDeposits"), {
+          uid: user.uid,
+          userEmail: user.email || "N/A",
+          userPhone: userPhoneNumber,
+          amount: amount,
+          senderName: senderName,
+          senderBank: senderBank,
+          senderAccountNo: senderAccNumValue,
+          status: "pending",
+          method: "Manual Bank Transfer",
+          timestamp: serverTimestamp(),
+          dateString: new Date().toLocaleString(),
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "Request Received",
+          html: `
           <div style="text-align:center; line-height:1.6;">
             <p style="margin:0; font-size:15px;">Your ₦${amount.toLocaleString()} deposit is pending.</p>
             <p style="margin-top:8px; color:#676d7d; font-size:13px;">Admin will verify your transfer shortly.</p>
           </div>
         `,
-        confirmButtonColor: '#10b981',
-        background: '#1c2333',
-        color: '#fff'
-      }).then(() => {
-        // Clear forms out and turn pages off safely
-        if(senderAccNumEl) senderAccNumEl.value = "";
-        document.getElementById("senderName").value = "";
-        document.getElementById("senderBank").value = "";
-        
-        senderDetailsPageEl.style.display = 'none';
-        if (dashboard) dashboard.style.display = 'block';
-        if (bottomNav) bottomNav.style.display = 'flex';
-      });
+          confirmButtonColor: "#10b981",
+          background: "#1c2333",
+          color: "#fff",
+        }).then(() => {
+          // Clear forms out and turn pages off safely
+          if (senderAccNumEl) senderAccNumEl.value = "";
+          document.getElementById("senderName").value = "";
+          document.getElementById("senderBank").value = "";
 
-    } catch (error) {
-      console.error("Manual Submission Failed:", error);
-      Swal.fire({ 
-        icon: 'error', 
-        title: 'Submission Failed', 
-        text: 'System busy. Please try again or contact support.',
-        background: '#1c2333',
-        color: '#fff'
-      });
-    }
-  });
-}
+          senderDetailsPageEl.style.display = "none";
+          if (dashboard) dashboard.style.display = "block";
+          if (bottomNav) bottomNav.style.display = "flex";
+        });
+      } catch (error) {
+        console.error("Manual Submission Failed:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Submission Failed",
+          text: "System busy. Please try again or contact support.",
+          background: "#1c2333",
+          color: "#fff",
+        });
+      }
+    });
+  }
 });
 
 // Function to handle the copy button
 window.copyText = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
-    // Show a small toast to let the user know it worked
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: 'Account number copied!',
-      showConfirmButton: false,
-      timer: 2000,
-      background: '#1c2333',
-      color: '#fff'
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      // Show a small toast to let the user know it worked
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Account number copied!",
+        showConfirmButton: false,
+        timer: 2000,
+        background: "#1c2333",
+        color: "#fff",
+      });
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
     });
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-  });
 };
 
+const profilePage = document.getElementById("profilePage");
 
-const profilePage = document.getElementById('profilePage');
-
-
-const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+const bottomNavItems = document.querySelectorAll(".bottom-nav .nav-item");
 // product page elements
-const productPage = document.getElementById('productPage');
-const productList = document.getElementById('productList');
-
+const productPage = document.getElementById("productPage");
+const productList = document.getElementById("productList");
 
 // Add click event to all nav items
 const pages = [
-  document.getElementById('dashboard'),
-  document.getElementById('profilePage'),
-  document.getElementById('rechargePage'),
-  document.getElementById('rechargeConfirmPage'), // include the recharge confirmation page
-  document.getElementById('productPage'),
-  document.getElementById('invitePage'), // <--- added here
-  document.getElementById('teamPage'),
-  document.getElementById('bankPage'),
-  document.getElementById('withdrawPage'), // 👈 Add this
+  document.getElementById("dashboard"),
+  document.getElementById("profilePage"),
+  document.getElementById("rechargePage"),
+  document.getElementById("rechargeConfirmPage"), // include the recharge confirmation page
+  document.getElementById("productPage"),
+  document.getElementById("invitePage"), // <--- added here
+  document.getElementById("teamPage"),
+  document.getElementById("bankPage"),
+  document.getElementById("withdrawPage"), // 👈 Add this
   document.getElementById("recordsPage"),
   document.getElementById("myInvestmentPage"),
-  document.getElementById("earningsPage")
+  document.getElementById("earningsPage"),
   // add other pages here if you create more
 ];
 
-
-bottomNavItems.forEach(item => {
-  item.addEventListener('click', function(e) {
+bottomNavItems.forEach((item) => {
+  item.addEventListener("click", function (e) {
     e.preventDefault();
 
     const text = item.textContent.trim().toLowerCase();
 
     let targetPage = null;
-    if (text.includes('home')) targetPage = pages[0];
-    if (text.includes('profile')) targetPage = pages[1];
-    if (text.includes('reviews')) targetPage = pages[4]; // productPage
-    if (text.includes('team')) targetPage = pages[6]; // View Team button fixes
-    if (text.includes('invite')) targetPage = pages[5];
-    if (text.includes('bank')) targetPage = pages[7];
-    if (text.includes('withdraw')) targetPage = pages[8];
-    if (text.includes('records')) targetPage = pages[9];
-    if (text.includes('my investment')) targetPage = pages[10];
-    if (text.includes('earnings')) targetPage = pages[11];
+    if (text.includes("home")) targetPage = pages[0];
+    if (text.includes("profile")) targetPage = pages[1];
+    if (text.includes("reviews")) targetPage = pages[4]; // productPage
+    if (text.includes("team")) targetPage = pages[6]; // View Team button fixes
+    if (text.includes("invite")) targetPage = pages[5];
+    if (text.includes("bank")) targetPage = pages[7];
+    if (text.includes("withdraw")) targetPage = pages[8];
+    if (text.includes("records")) targetPage = pages[9];
+    if (text.includes("my investment")) targetPage = pages[10];
+    if (text.includes("earnings")) targetPage = pages[11];
 
     if (!targetPage) return;
 
-    const loader = document.getElementById('pageLoader');
-    loader.style.display = 'flex';
-    loader.style.opacity = '1';
+    const loader = document.getElementById("pageLoader");
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
 
     setTimeout(() => {
-      pages.forEach(page => {
-        if(page) page.style.display = 'none';
+      pages.forEach((page) => {
+        if (page) page.style.display = "none";
       });
 
-      if (targetPage.id === 'invitePage') {
-  targetPage.style.display = 'flex';
-  targetPage.style.flexDirection = 'column';
-} else {
-  targetPage.style.display = 'block';
-}
-// 🚀 ADD THIS LINE HERE:
-      localStorage.setItem('lastPage', targetPage.id);
+      if (targetPage.id === "invitePage") {
+        targetPage.style.display = "flex";
+        targetPage.style.flexDirection = "column";
+      } else {
+        targetPage.style.display = "block";
+      }
+      // 🚀 ADD THIS LINE HERE:
+      localStorage.setItem("lastPage", targetPage.id);
 
-      loader.style.opacity = '0';
-      setTimeout(() => loader.style.display = 'none', 500);
+      loader.style.opacity = "0";
+      setTimeout(() => (loader.style.display = "none"), 500);
     }, 300);
   });
 });
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
-  const earningsPage = document.getElementById("earningsPage");       // Team page
+  const earningsPage = document.getElementById("earningsPage"); // Team page
   const earningsBackBtn = document.getElementById("earningsBackBtn"); // Back button inside team page
-  const bottomNav = document.getElementById("bottomNav");             // Bottom nav
-  const dashboard = document.getElementById("dashboard");             // Default page to return to
+  const bottomNav = document.getElementById("bottomNav"); // Bottom nav
+  const dashboard = document.getElementById("dashboard"); // Default page to return to
 
-  const earningsBtn = document.getElementById("earningsBtn");         // Button to open team page
+  const earningsBtn = document.getElementById("earningsBtn"); // Button to open team page
   if (earningsBtn) {
     earningsBtn.addEventListener("click", () => {
       // Hide all other pages safely
       if (pages && pages.length) {
-        pages.forEach(p => {
+        pages.forEach((p) => {
           if (p) p.style.display = "none";
         });
       }
@@ -1712,48 +1733,42 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const bottomNav = document.getElementById("bottomNav");
   const withdrawPage = document.getElementById("withdrawPage");
   const dashboard = document.getElementById("dashboard");
   const withdrawBackBtn = document.getElementById("withdrawBackBtn");
 
+  const withdrawBtns = document.querySelectorAll(
+    ".qa-btn.withdraw, #withdrawBtn",
+  );
 
-  const withdrawBtns = document.querySelectorAll('.qa-btn.withdraw, #withdrawBtn');
+  withdrawBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      // Hide all pages safely
+      if (pages && pages.length) {
+        pages.forEach((p) => {
+          if (p) p.style.display = "none";
+        });
+      }
 
-  
+      if (withdrawPage) withdrawPage.style.display = "block";
+      if (bottomNav) bottomNav.style.display = "none";
 
-withdrawBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Hide all pages safely
-    if (pages && pages.length) {
-      pages.forEach(p => {
-        if (p) p.style.display = 'none';
-      });
-    }
-
-    if (withdrawPage) withdrawPage.style.display = 'block';
-    if (bottomNav) bottomNav.style.display = 'none';
-
-    // Load withdraw data
-    if (typeof loadWithdrawData === "function") loadWithdrawData();
+      // Load withdraw data
+      if (typeof loadWithdrawData === "function") loadWithdrawData();
+    });
   });
-});
-
 
   // Back button click
   if (withdrawBackBtn) {
-    withdrawBackBtn.addEventListener('click', () => {
-      withdrawPage.style.display = 'none';
-      dashboard.style.display = 'block';
-      bottomNav.style.display = 'flex';
+    withdrawBackBtn.addEventListener("click", () => {
+      withdrawPage.style.display = "none";
+      dashboard.style.display = "block";
+      bottomNav.style.display = "flex";
     });
   }
 });
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const recordsPage = document.getElementById("recordsPage");
@@ -1766,7 +1781,7 @@ document.addEventListener("DOMContentLoaded", () => {
     recordsBtn.addEventListener("click", () => {
       // Hide all other pages safely
       if (pages && pages.length) {
-        pages.forEach(p => {
+        pages.forEach((p) => {
           if (p) p.style.display = "none";
         });
       }
@@ -1783,7 +1798,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
   // Back button click → return to home/dashboard
   if (recordsBackBtn) {
     recordsBackBtn.addEventListener("click", () => {
@@ -1793,8 +1807,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const investmentPage = document.getElementById("myInvestmentPage");
@@ -1814,218 +1826,205 @@ document.addEventListener("DOMContentLoaded", () => {
       bottomNav.style.display = "flex";
 
       // 🔒 clear countdown timers
-      countdownIntervals.forEach(id => clearInterval(id));
+      countdownIntervals.forEach((id) => clearInterval(id));
       countdownIntervals = [];
     });
   }
 
-  
   // ================= INVESTMENT RECORDS =================
-if (investmentRecordsBtn) {
-  investmentRecordsBtn.addEventListener("click", async () => {
-    // hide all pages safely
-    if (typeof pages !== "undefined" && pages.length) {
-      pages.forEach(p => {
-        if (p) p.style.display = "none"; // ✅ safe assignment
-      });
-    }
+  if (investmentRecordsBtn) {
+    investmentRecordsBtn.addEventListener("click", async () => {
+      // hide all pages safely
+      if (typeof pages !== "undefined" && pages.length) {
+        pages.forEach((p) => {
+          if (p) p.style.display = "none"; // ✅ safe assignment
+        });
+      }
 
-    if (!investmentPage) return;
+      if (!investmentPage) return;
 
-    investmentPage.style.display = "block";
-    if (bottomNav) bottomNav.style.display = "none";
+      investmentPage.style.display = "block";
+      if (bottomNav) bottomNav.style.display = "none";
 
-    const container = document.querySelector(".premium-card");
-    if (!container) return;
+      // Targeted the container inside the investment page
+      const container =
+        document.getElementById("investmentRecordsWrapper") ||
+        document.querySelector("#myInvestmentPage .card-wrapper");
+      if (!container) return;
 
-    const user = auth?.currentUser;
-   if (!user) {
-    window.showToast('Not Logged In: Please log in first!', 'error');
-    return;
-}
+      const user = auth?.currentUser;
+      if (!user) {
+        window.showToast("Not Logged In: Please log in first!", "error");
+        return;
+      }
 
-const userRef = doc(db, "users", user.uid);
-const snap = await getDoc(userRef);
-if (!snap.exists()) {
-    window.showToast('User Data Not Found: Please log in again!', 'error');
-    return;
-}
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) {
+        window.showToast("User Data Not Found: Please log in again!", "error");
+        return;
+      }
 
-    let investments = snap.data().investments || [];
-    if (!Array.isArray(investments)) investments = Object.values(investments);
+      let investments = snap.data().investments || [];
+      if (!Array.isArray(investments)) investments = Object.values(investments);
 
-    container.innerHTML = "";
+      container.innerHTML = "";
 
-   
-    if (investments.length === 0) {
-  container.innerHTML =  `
+      if (investments.length === 0) {
+        container.innerHTML = `
    
   `;
-  return;
-}
+        return;
+      }
 
+      // 🔒 clear old countdowns before rendering again
+      countdownIntervals.forEach((id) => clearInterval(id));
+      countdownIntervals = [];
 
-    // 🔒 clear old countdowns before rendering again
-    countdownIntervals.forEach(id => clearInterval(id));
-    countdownIntervals = [];
+      investments.forEach((inv, index) => {
+        // ===== NORMALIZE DATA =====
+        let purchaseTime = inv.purchaseTime;
 
-    investments.forEach((inv, index) => {
-      // ===== NORMALIZE DATA =====
-      let purchaseTime = inv.purchaseTime;
+        if (purchaseTime?.seconds) {
+          purchaseTime = purchaseTime.seconds * 1000;
+        } else {
+          purchaseTime = Number(purchaseTime);
+        }
 
-if (purchaseTime?.seconds) {
-  purchaseTime = purchaseTime.seconds * 1000;
-} else {
-  purchaseTime = Number(purchaseTime);
-}
+        if (!purchaseTime || isNaN(purchaseTime)) {
+          purchaseTime = Date.now();
+        }
 
-if (!purchaseTime || isNaN(purchaseTime)) {
-  purchaseTime = Date.now();
-}
+        const totalEarned = Number(inv.totalEarned) || 0;
+        const daily = Number(inv.daily) || 0;
+        const days = Number(inv.days) || 0;
+        const price = Number(inv.price) || 0;
+        const status = inv.status || "active";
 
-      const totalEarned = Number(inv.totalEarned) || 0;
-      const daily = Number(inv.daily) || 0;
-      const days = Number(inv.days) || 0;
-      const price = Number(inv.price) || 0;
-      const status = inv.status || "active";
-     
- 
-      const card = document.createElement("div");
- 
-      card.className = "premium-card";
+        const progress = ((inv.lastPaidDay || 0) / inv.days) * 100;
+        const daysLeft = inv.days - (inv.lastPaidDay || 0);
 
-const progress = ((inv.lastPaidDay || 0) / inv.days) * 100;
-const daysLeft = inv.days - (inv.lastPaidDay || 0);
+        const cardHtml = `
+  <div class="invest-card">
+    <div class="header-main">
+      <div class="plan-icon-box">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
 
-card.innerHTML = `
-  <div class="header-main">
-    <div class="plan-icon-box">
-      <i class="fa-solid fa-chart-line"></i>
+      <div class="title-group">
+        <span class="plan-title">${inv.name || "RAMBO ENGINE"}</span>
+        <h2 class="plan-price">₦${price.toLocaleString()}</h2>
+      </div>
+
+      <div class="active-tag">${status === "active" ? "● Active" : "Completed"}</div>
     </div>
 
-    <div class="title-group">
-      <span class="plan-title">${inv.name || 'Investment Plan'}</span>
-      <h2 class="plan-price">₦${inv.price.toLocaleString()}</h2>
+    <div class="timer-box">
+      <span class="timer-label">NEXT REVENUE DROP</span>
+      <div class="countdown" id="cd-${index}">00h 00m 00s</div>
     </div>
 
-    <div class="active-tag">● Active</div>
-  </div>
-
-  <div class="timer-box">
-    <span class="timer-label">NEXT INCOME IN</span>
-    <div class="countdown" id="cd-${index}">00 : 00 : 00</div>
-  </div>
-
-  <div class="cycle-section">
-    <div class="detail-item">
-      <span>Progress</span>
-      <span>${Math.round(progress)}% — ${daysLeft}d left</span>
+    <div class="cycle-section">
+      <div class="detail-item">
+        <span>Maturity Progress</span>
+        <span>${Math.round(progress)}% (${daysLeft} Days Remaining)</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-fill" style="width: ${progress}%"></div>
+      </div>
     </div>
 
-    <div class="progress-bar-bg">
-      <div class="progress-fill" style="width: ${progress}%"></div>
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-box">
-      <span class="stat-label">INVESTMENT</span>
-      <span class="stat-value">₦${inv.price.toLocaleString()}</span>
-    </div>
-
-    <div class="stat-box">
-      <span class="stat-label">PER DAY</span>
-      <span class="stat-value">₦${inv.daily.toLocaleString()}</span>
-    </div>
-
-    <div class="stat-box">
-      <span class="stat-label">TOTAL</span>
-      <span class="stat-value">₦${(inv.daily * inv.days).toLocaleString()}</span>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-label">DAILY YIELD</span>
+        <span class="stat-value">₦${daily.toLocaleString()}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">TOTAL PROJECTED</span>
+        <span class="stat-value">₦${(daily * days).toLocaleString()}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">TOTAL EARNED</span>
+        <span class="stat-value" id="earned-${index}">₦${totalEarned.toLocaleString()}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">CONTRACT TERM</span>
+        <span class="stat-value">${days} Days</span>
+      </div>
     </div>
 
-    <div class="stat-box">
-      <span class="stat-label">CYCLES</span>
-      <span class="stat-value">${inv.days}</span>
-    </div>
-  </div>
-
-  <div class="details-list">
-    <div class="detail-item">
-      <span>Started</span>
-      <span>${inv.dateStarted || '---'}</span>
-    </div>
-
-    <div class="detail-item">
-      <span>Ends</span>
-      <span>${inv.dateEnding || '---'}</span>
-    </div>
-
-    <div class="detail-item">
-      <span>Capital</span>
-      <span style="color:#00ff88;">100% Returned</span>
+    <div class="details-list">
+      <div class="detail-item">
+        <span>Deployment Date</span>
+        <span>${inv.dateStarted || "Standard"}</span>
+      </div>
+      <div class="detail-item">
+        <span>Projected End</span>
+        <span>${inv.dateEnding || "Auto"}</span>
+      </div>
+      <div class="detail-item">
+        <span>Capital Protection</span>
+        <span style="color:var(--green);">Guaranteed</span>
+      </div>
     </div>
   </div>
 `;
 
-container.appendChild(card);
+        container.insertAdjacentHTML("beforeend", cardHtml);
 
-// ===== GET ELEMENTS SAFELY =====
-const cdEl = document.getElementById(`cd-${index}`);
-const earnedEl = document.getElementById(`earned-${index}`);
+        // ===== GET ELEMENTS SAFELY =====
+        const cdEl = document.getElementById(`cd-${index}`);
+        const earnedEl = document.getElementById(`earned-${index}`);
 
-// ===== SET EARNED ONCE (NO REWRITE LOOP) =====
-if (earnedEl) earnedEl.textContent = `₦${totalEarned.toLocaleString()}`;
+        // ===== SET EARNED ONCE (NO REWRITE LOOP) =====
+        if (earnedEl) earnedEl.textContent = `₦${totalEarned.toLocaleString()}`;
 
-if (cdEl) {
-  let intervalId; // <-- ADD THIS line before defining updateCountdown
+        if (cdEl) {
+          let intervalId; // <-- ADD THIS line before defining updateCountdown
 
-  const updateCountdown = () => {
-    const now = Date.now();
-    const elapsedDays = Math.floor((now - purchaseTime) / MS_IN_DAY);
+          const updateCountdown = () => {
+            const now = Date.now();
+            const elapsedDays = Math.floor((now - purchaseTime) / MS_IN_DAY);
 
-    if (elapsedDays >= days || status === "completed") {
-      cdEl.textContent = "Ended";
-      clearInterval(intervalId); // ✅ now safe
-      return;
-    }
+            if (elapsedDays >= days || status === "completed") {
+              cdEl.textContent = "Ended";
+              clearInterval(intervalId); // ✅ now safe
+              return;
+            }
 
-    const nextPayoutTime = purchaseTime + (elapsedDays + 1) * MS_IN_DAY;
-    const remaining = Math.max(0, nextPayoutTime - now);
+            const nextPayoutTime = purchaseTime + (elapsedDays + 1) * MS_IN_DAY;
+            const remaining = Math.max(0, nextPayoutTime - now);
 
-    const h = Math.floor(remaining / 3600000);
-    const m = Math.floor((remaining % 3600000) / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
+            const h = Math.floor(remaining / 3600000);
+            const m = Math.floor((remaining % 3600000) / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
 
-    cdEl.textContent = `${h}h ${m}m ${s}s`;
-  };
+            cdEl.textContent = `${h}h ${m}m ${s}s`;
+          };
 
-  updateCountdown();
-  intervalId = setInterval(updateCountdown, 1000); // assign after
-  countdownIntervals.push(intervalId);
-}
-
-
+          updateCountdown();
+          intervalId = setInterval(updateCountdown, 1000); // assign after
+          countdownIntervals.push(intervalId);
+        }
+      });
     });
-  });
-  } 
-});
-
-
-
-const FintechToast = Swal.mixin({
-  toast: true,
-  position: 'top-end',
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true,
-  background: '#fff',
-  color: '#111',
-  customClass: {
-    popup: 'fintech-toast'
   }
 });
 
- // ======================================================
+const FintechToast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  background: "#fff",
+  color: "#111",
+  customClass: {
+    popup: "fintech-toast",
+  },
+});
+
+// ======================================================
 // INVESTMENT PRODUCTS
 // ======================================================
 const products = [
@@ -2035,10 +2034,7 @@ const products = [
   { name: "Craft Land 4", price: 20000, daily: 3000, days: 50 },
   { name: "Craft Land 5", price: 30000, daily: 4500, days: 50 },
   { name: "Craft Land 6", price: 50000, daily: 7500, days: 50 },
-  { name: "Craft Land 7", price: 100000, daily: 15000, days: 50 }
- 
-  
- 
+  { name: "Craft Land 7", price: 100000, daily: 15000, days: 50 },
 ];
 
 // ======================================================
@@ -2047,12 +2043,11 @@ const products = [
 
 let investmentInterval = null;
 
-
 async function handleInvestment(event, amount, daily, days, planName) {
   const btn = event.target;
   const user = auth.currentUser;
   if (!user) {
-    window.showToast('Not Logged In: Please log in first!', 'error');
+    window.showToast("Not Logged In: Please log in first!", "error");
     return;
   }
 
@@ -2071,44 +2066,46 @@ async function handleInvestment(event, amount, daily, days, planName) {
 
     // --- 2. VALIDATION ---
     if (balance < amount) {
-      window.showToast('Insufficient balance: Add funds to continue.', 'warning');
+      window.showToast(
+        "Insufficient balance: Add funds to continue.",
+        "warning",
+      );
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("productPage").style.display = "none";
       document.getElementById("rechargePage").style.display = "block";
-      return; 
+      return;
     }
 
     const investments = Array.isArray(data.investments) ? data.investments : [];
 
     // --- 3. ATOMIC UPDATE ---
     investments.push({
-      purchaseId: "INV-" + Date.now() + "-" + Math.floor(Math.random() * 1000), 
+      purchaseId: "INV-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
       name: planName || "Investment",
       price: amount,
       daily,
       days,
       purchaseTime: Date.now(),
       totalEarned: 0,
-      lastPaidDay: 0, 
-      status: "active"
+      lastPaidDay: 0,
+      status: "active",
     });
 
     await updateDoc(userRef, {
       balance: increment(-amount),
-      investments
+      investments,
     });
 
     // --- 4. SUCCESS UI ---
     const balEl = document.getElementById("user-balance");
     if (balEl) balEl.textContent = (balance - amount).toLocaleString();
 
-    window.showToast('Investment Successful!', 'success');
+    window.showToast("Investment Successful!", "success");
     showDashboard();
     startInvestmentSystem(user.uid);
-
   } catch (err) {
     console.error("Investment Error:", err);
-    window.showToast('Transaction failed. Please try again.', 'error');
+    window.showToast("Transaction failed. Please try again.", "error");
   } finally {
     // --- 5. ALWAYS UNLOCK BUTTON ---
     btn.disabled = false;
@@ -2116,14 +2113,13 @@ async function handleInvestment(event, amount, daily, days, planName) {
   }
 }
 
-
 // ======================================================
 // SYNC EARNINGS (OPTIMIZED - 1 READ TOTAL)
 // ======================================================
 async function syncEarnings(userId) {
   // ✅ QUOTA SAVER: If a sync is already running, KILL this duplicate call immediately
-  if (!userId || isSyncingNow) return; 
-  
+  if (!userId || isSyncingNow) return;
+
   isSyncingNow = true; // Set the lock
 
   try {
@@ -2137,7 +2133,7 @@ async function syncEarnings(userId) {
     const data = snap.data();
     const investments = Array.isArray(data.investments) ? data.investments : [];
     const now = Date.now();
-    
+
     let totalEarningsToCredit = 0;
     let hasChanges = false;
 
@@ -2147,18 +2143,20 @@ async function syncEarnings(userId) {
     for (const inv of investments) {
       if (inv.status !== "active") continue;
 
-      const daysSincePurchase = Math.floor((now - inv.purchaseTime) / MS_IN_DAY);
+      const daysSincePurchase = Math.floor(
+        (now - inv.purchaseTime) / MS_IN_DAY,
+      );
       const totalPayableDays = Math.min(daysSincePurchase, inv.days);
       const daysOwed = totalPayableDays - (inv.lastPaidDay || 0);
 
       if (daysOwed > 0) {
         // Calculate total for this specific plan
         const amountForThisPlan = daysOwed * inv.daily;
-        
+
         inv.totalEarned = (inv.totalEarned || 0) + amountForThisPlan;
         inv.lastPaidDay = totalPayableDays;
         totalEarningsToCredit += amountForThisPlan;
-        
+
         // ✅ QUOTA SAVER: Instead of 1 record per day, save 1 summary for all owed days
         await addDoc(recRef, {
           type: "Investment Profit",
@@ -2167,7 +2165,7 @@ async function syncEarnings(userId) {
           daysCredited: daysOwed,
           timestamp: serverTimestamp(),
           plan: inv.name,
-          note: `Earnings for ${daysOwed} day(s)`
+          note: `Earnings for ${daysOwed} day(s)`,
         });
 
         hasChanges = true;
@@ -2183,20 +2181,19 @@ async function syncEarnings(userId) {
       // ✅ FINAL UPDATE: Credit balance in one go
       await updateDoc(userRef, {
         balance: increment(totalEarningsToCredit),
-        investments: investments 
+        investments: investments,
       });
       console.log(`Success: Credited ₦${totalEarningsToCredit}`);
     }
 
     // Refresh UI
     if (typeof renderCountdowns === "function") renderCountdowns(investments);
-    
+
     const balEl = document.getElementById("user-balance");
     if (balEl) {
       const currentBal = Number(data.balance) || 0;
       balEl.textContent = (currentBal + totalEarningsToCredit).toLocaleString();
     }
-
   } catch (error) {
     console.error("Sync Earnings Error:", error);
   } finally {
@@ -2207,9 +2204,7 @@ async function syncEarnings(userId) {
 // ======================================================
 // GLOBALS & CONFIG
 // ======================================================
-let userInvestmentsLocal = []; 
-
-
+let userInvestmentsLocal = [];
 
 // ======================================================
 // 1. START SYSTEM (RUNS ONCE ON LOGIN)
@@ -2233,7 +2228,7 @@ async function startInvestmentSystem(userId) {
   // Updates every 1 second for a "Premium" feel without hitting Firebase.
   investmentInterval = setInterval(() => {
     renderCountdowns(userInvestmentsLocal);
-  }, 1000); 
+  }, 1000);
 }
 
 // ======================================================
@@ -2248,7 +2243,8 @@ function renderCountdowns(investments) {
     const earnedEl = document.getElementById(`earned-${i}`);
     if (!cdEl) return;
 
-    if (earnedEl) earnedEl.textContent = (inv.totalEarned || 0).toLocaleString();
+    if (earnedEl)
+      earnedEl.textContent = (inv.totalEarned || 0).toLocaleString();
 
     if (inv.status === "completed") {
       cdEl.textContent = "Completed";
@@ -2259,7 +2255,7 @@ function renderCountdowns(investments) {
     const daysSinceStart = Math.floor((now - inv.purchaseTime) / MS_IN_DAY);
     const nextPayoutTime = inv.purchaseTime + (daysSinceStart + 1) * MS_IN_DAY;
     const remaining = Math.max(0, nextPayoutTime - now);
-    
+
     // ✅ FIXED MATH:
     // 1. Get total hours
     const h = Math.floor(remaining / (1000 * 60 * 60));
@@ -2272,7 +2268,7 @@ function renderCountdowns(investments) {
     cdEl.textContent = `${h}h ${m}m ${s}s`;
 
     if (remaining <= 1000 && inv.status === "active") {
-        setTimeout(() => location.reload(), 2000);
+      setTimeout(() => location.reload(), 2000);
     }
   });
 }
@@ -2288,7 +2284,6 @@ onAuthStateChanged(auth, (user) => {
     userInvestmentsLocal = [];
   }
 });
-
 
 // ======================================================
 // INVEST BUTTON HANDLER (FIXED)
@@ -2310,8 +2305,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ================= PRICE + DAILY =================
     const infoRows = card.querySelectorAll(".info-row");
 
-    infoRows.forEach(row => {
-      const label = row.querySelector(".info-label")?.innerText.toLowerCase() || "";
+    infoRows.forEach((row) => {
+      const label =
+        row.querySelector(".info-label")?.innerText.toLowerCase() || "";
       const value = row.querySelector(".info-value")?.innerText || "";
 
       if (label.includes("price")) {
@@ -2323,17 +2319,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-   
     // ================= DURATION (FIXED) =================
-infoRows.forEach(row => {
-  const label = row.querySelector(".info-label")?.innerText.toLowerCase() || "";
-  const value = row.querySelector(".info-value")?.innerText || "";
+    infoRows.forEach((row) => {
+      const label =
+        row.querySelector(".info-label")?.innerText.toLowerCase() || "";
+      const value = row.querySelector(".info-value")?.innerText || "";
 
-  if (label.includes("period")) {
-    days = parseInt(value.replace(/[^0-9]/g, ""), 10) || 0;
-  }
-});
-
+      if (label.includes("period")) {
+        days = parseInt(value.replace(/[^0-9]/g, ""), 10) || 0;
+      }
+    });
 
     // ================= DEBUG =================
     console.log("Investment values →", { price, daily, days });
@@ -2346,7 +2341,7 @@ infoRows.forEach(row => {
 
     // ================= CALL =================
     showLoader({
-      callback: () => handleInvestment(price, daily, days)
+      callback: () => handleInvestment(price, daily, days),
     });
   });
 });
@@ -2354,7 +2349,6 @@ infoRows.forEach(row => {
 window.handleInvestment = handleInvestment;
 
 document.addEventListener("DOMContentLoaded", () => {
-
   const welcomePopup = document.getElementById("welcomePopup");
   const closePopup = document.getElementById("closePopup");
   const bottomNav = document.getElementById("bottomNav");
@@ -2380,29 +2374,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Call this after login
   // afterLogin();
-
 });
-
 
 function openInvitePage() {
   // hide ALL pages first
-  pages.forEach(page => {
-    if (page) page.style.display = 'none';
+  pages.forEach((page) => {
+    if (page) page.style.display = "none";
   });
 
   // show invite page properly
-  invitePage.style.display = 'flex';
-  invitePage.style.flexDirection = 'column';
+  invitePage.style.display = "flex";
+  invitePage.style.flexDirection = "column";
 
   // hide bottom nav if needed
-  bottomNav.style.display = 'none';
+  bottomNav.style.display = "none";
 
   // load referral data
   const user = auth.currentUser;
   if (user) setupReferral(user);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const bottomNav = document.getElementById("bottomNav");
   const invitePage = document.getElementById("invitePage");
   const teamPage = document.getElementById("teamPage");
@@ -2413,96 +2405,91 @@ document.addEventListener('DOMContentLoaded', () => {
   const refCardBtn = document.getElementById("refCard"); // Invite button
 
   // ------------------ Disable "View Team" buttons on Invite Page ------------------
-  viewTeamButtons.forEach(btn => btn.disabled = true);
+  viewTeamButtons.forEach((btn) => (btn.disabled = true));
 
   // ------------------ Bottom Nav Clicks ------------------
-  bottomNavItems.forEach(item => {
-    item.addEventListener('click', function () {
+  bottomNavItems.forEach((item) => {
+    item.addEventListener("click", function () {
       const text = item.textContent.trim().toLowerCase();
 
       // Hide all pages first
-      [dashboard, invitePage, teamPage].forEach(p => {
-        if (p) p.style.display = 'none';
+      [dashboard, invitePage, teamPage].forEach((p) => {
+        if (p) p.style.display = "none";
       });
 
       if (text === "home") {
-        dashboard.style.display = 'block';
-        bottomNav.style.display = 'flex';
+        dashboard.style.display = "block";
+        bottomNav.style.display = "flex";
       }
 
-     if (text.includes('invite')) {
-  openInvitePage();
-  return;
-}
+      if (text.includes("invite")) {
+        openInvitePage();
+        return;
+      }
 
       if (text === "team") {
-        teamPage.style.display = 'block';
-        invitePage.style.display = 'none';
-        bottomNav.style.display = 'none';
+        teamPage.style.display = "block";
+        invitePage.style.display = "none";
+        bottomNav.style.display = "none";
         openTeam(1); // Load Level 1 by default
       }
     });
   });
 
-  
-
   // ------------------ Invite Button (refCard) Click ------------------
-if (refCardBtn) {
-  refCardBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    openInvitePage();
-  });
-}
+  if (refCardBtn) {
+    refCardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openInvitePage();
+    });
+  }
 
-// ------------------ Share Button (shareBtn) Click ------------------
-const shareBtn = document.getElementById('shareBtn');
+  // ------------------ Share Button (shareBtn) Click ------------------
+  const shareBtn = document.getElementById("shareBtn");
 
-if (shareBtn) {
-  shareBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    openInvitePage();
-  });
-}
+  if (shareBtn) {
+    shareBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openInvitePage();
+    });
+  }
 
   const myTeamBtn = document.getElementById("myTeamBtn");
 
-if (myTeamBtn) {
-  myTeamBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  if (myTeamBtn) {
+    myTeamBtn.addEventListener("click", (e) => {
+      e.preventDefault();
 
-    // Hide all pages in the pages array
-    pages.forEach(p => {
-      if (p) p.style.display = "none";
+      // Hide all pages in the pages array
+      pages.forEach((p) => {
+        if (p) p.style.display = "none";
+      });
+
+      // Hide bottom nav
+      if (bottomNav) bottomNav.style.display = "none";
+
+      // Show the invite/referral page
+      if (invitePage) {
+        invitePage.style.display = "flex";
+        invitePage.style.flexDirection = "column";
+        invitePage.style.width = "100%";
+      }
+
+      // Setup referral
+      const user = auth.currentUser;
+      if (user) setupReferral(user);
     });
-
-    // Hide bottom nav
-    if (bottomNav) bottomNav.style.display = "none";
-
-    // Show the invite/referral page
-    if (invitePage) {
-      invitePage.style.display = "flex";
-      invitePage.style.flexDirection = "column";
-      invitePage.style.width = "100%";
-    }
-
-    // Setup referral
-    const user = auth.currentUser;
-    if (user) setupReferral(user);
-  });
-}
-
-
+  }
 
   // ------------------ Invite Back Button ------------------
   if (inviteBackBtn) {
-    inviteBackBtn.addEventListener('click', () => {
-      invitePage.style.display = 'none';
-      dashboard.style.display = 'block';
-      bottomNav.style.display = 'flex';
+    inviteBackBtn.addEventListener("click", () => {
+      invitePage.style.display = "none";
+      dashboard.style.display = "block";
+      bottomNav.style.display = "flex";
     });
   }
 });
-
 
 function copyInviteLink() {
   const refInput = document.getElementById("refLink");
@@ -2515,8 +2502,8 @@ function copyInviteLink() {
   // Use execCommand for compatibility
   document.execCommand("copy");
 
-  window.showToast('Copied: Referral link copied to clipboard!', 'success');
-} 
+  window.showToast("Copied: Referral link copied to clipboard!", "success");
+}
 window.copyInviteLink = copyInviteLink;
 
 // ------------------ Copy Invite Code ------------------
@@ -2531,10 +2518,9 @@ function copyInviteCode() {
   document.execCommand("copy");
   document.body.removeChild(temp);
 
-  window.showToast('Invite code copied successfully!', 'success');
-} 
+  window.showToast("Invite code copied successfully!", "success");
+}
 window.copyInviteCode = copyInviteCode;
-
 
 // ------------------ Setup Referral ------------------
 async function setupReferral(user) {
@@ -2570,32 +2556,37 @@ function generateReferralId() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const numbers = "0123456789";
 
-  const part1 = Array.from({ length: 3 }, () =>
-    letters[Math.floor(Math.random() * letters.length)]
+  const part1 = Array.from(
+    { length: 3 },
+    () => letters[Math.floor(Math.random() * letters.length)],
   ).join("");
 
-  const part2 = Array.from({ length: 3 }, () =>
-    numbers[Math.floor(Math.random() * numbers.length)]
+  const part2 = Array.from(
+    { length: 3 },
+    () => numbers[Math.floor(Math.random() * numbers.length)],
   ).join("");
 
   return part1 + part2;
 }
 
-
 const referralLink = document.getElementById("refLink");
 
-document.querySelectorAll('.share-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
+document.querySelectorAll(".share-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
     e.preventDefault();
     const link = referralLink.value;
     let url = "#";
 
-    if (btn.classList.contains('facebook')) url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
-    if (btn.classList.contains('twitter')) url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}`;
-    if (btn.classList.contains('whatsapp')) url = `https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`;
-    if (btn.classList.contains('telegram')) url = `https://t.me/share/url?url=${encodeURIComponent(link)}`;
-  
-    window.open(url, '_blank');
+    if (btn.classList.contains("facebook"))
+      url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+    if (btn.classList.contains("twitter"))
+      url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}`;
+    if (btn.classList.contains("whatsapp"))
+      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`;
+    if (btn.classList.contains("telegram"))
+      url = `https://t.me/share/url?url=${encodeURIComponent(link)}`;
+
+    window.open(url, "_blank");
   });
 });
 
@@ -2611,7 +2602,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (l1Btn) setActiveTab(l1Btn);
 
     // 3. Trigger the data load
-    loadTeam(1); 
+    loadTeam(1);
 
     // 4. Hide nav
     const nav = document.getElementById("bottomNav");
@@ -2619,12 +2610,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 // ======================================================
 // AUTO CLAIM COMMISSION (DYNAMIC & DUAL-DB OPTIMIZED)
 // ======================================================
-
-
 
 async function startAutoClaim() {
   if (autoClaimStarted) return;
@@ -2641,14 +2629,16 @@ async function startAutoClaim() {
 
     // 2️⃣ Fetch Dynamic Rates from Admin Panel (Main DB)
     const ratesSnap = await getDoc(doc(db, "adminSettings", "rates"));
-    const globalRates = ratesSnap.exists() 
-      ? ratesSnap.data() 
+    const globalRates = ratesSnap.exists()
+      ? ratesSnap.data()
       : { level1: 0.25, level2: 0.02 }; // Professional default fallback
 
     const uData = snap.data();
-    
+
     // We keep 'trackedInvestments' in Main DB to prevent duplicate payout loops
-    const claimed = Array.isArray(uData.trackedInvestments) ? uData.trackedInvestments : [];
+    const claimed = Array.isArray(uData.trackedInvestments)
+      ? uData.trackedInvestments
+      : [];
 
     let newClaimed = [...claimed];
     let balanceIncrease = 0;
@@ -2656,15 +2646,15 @@ async function startAutoClaim() {
 
     // Referrals lists are currently in Main DB
     const referrals = [
-      ...(uData.referrals?.level1 || []).map(r => ({ uid: r.uid, level: 1 })),
-      ...(uData.referrals?.level2 || []).map(r => ({ uid: r.uid, level: 2 }))
+      ...(uData.referrals?.level1 || []).map((r) => ({ uid: r.uid, level: 1 })),
+      ...(uData.referrals?.level2 || []).map((r) => ({ uid: r.uid, level: 2 })),
     ];
 
     // 3️⃣ Loop through each referral to check for new investments
     for (const ref of referrals) {
       const refRef = doc(db, "users", ref.uid);
       const refSnap = await getDoc(refRef);
-      
+
       if (!refSnap.exists()) continue;
 
       const refData = refSnap.data();
@@ -2697,8 +2687,8 @@ async function startAutoClaim() {
             refNumber: refData.number || "User",
             status: "success", // For the records page logic
             timestamp: serverTimestamp(), // Use Firestore server time
-            description: `Level ${ref.level} commission from ${refData.number || 'referral'}`
-          }
+            description: `Level ${ref.level} commission from ${refData.number || "referral"}`,
+          },
         });
       }
     }
@@ -2707,8 +2697,8 @@ async function startAutoClaim() {
     if (balanceIncrease > 0) {
       try {
         // A. Save logs to transactionDb (Heavy Load)
-        const batchPromises = recordsToSave.map(rec => 
-          setDoc(doc(transactionDb, "records", rec.id), rec.data)
+        const batchPromises = recordsToSave.map((rec) =>
+          setDoc(doc(transactionDb, "records", rec.id), rec.data),
         );
         await Promise.all(batchPromises);
 
@@ -2716,7 +2706,7 @@ async function startAutoClaim() {
         await updateDoc(userRef, {
           balance: increment(balanceIncrease),
           totalCommission: increment(balanceIncrease),
-          trackedInvestments: newClaimed
+          trackedInvestments: newClaimed,
         });
 
         console.log(`✅ Success: Claimed ₦${balanceIncrease} in commissions.`);
@@ -2728,15 +2718,14 @@ async function startAutoClaim() {
 }
 
 // 🛡️ AUTH WATCHER: Ensures the system starts when the user logs in
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged((user) => {
   if (user) {
     console.log("Auto-Claim System: INITIALIZING...");
     startAutoClaim();
   } else {
-    autoClaimStarted = false; 
+    autoClaimStarted = false;
   }
 });
-
 
 // ======================================================
 // SHOW / HIDE DETAIL VIEW
@@ -2759,7 +2748,6 @@ async function loadSummary() {
   const user = auth.currentUser;
   if (!user) return;
 
-
   console.log("User UID:", user.uid); // ADD THIS
 
   try {
@@ -2773,12 +2761,13 @@ async function loadSummary() {
 
     const userData = userSnap.data();
 
-     console.log("Referrals data:", userData.referrals); // ADD THIS
+    console.log("Referrals data:", userData.referrals); // ADD THIS
 
     for (const level of [1, 2]) {
-      const referrals = level === 1
-        ? (userData.referrals?.level1 || [])
-        : (userData.referrals?.level2 || []);
+      const referrals =
+        level === 1
+          ? userData.referrals?.level1 || []
+          : userData.referrals?.level2 || [];
 
       const commRate = level === 1 ? globalRates.level1 : globalRates.level2;
 
@@ -2789,7 +2778,7 @@ async function loadSummary() {
         if (!refSnap.exists()) continue;
 
         const investments = refSnap.data().investments || [];
-        investments.forEach(inv => {
+        investments.forEach((inv) => {
           totalInvest += Number(inv.price || 0);
         });
       }
@@ -2797,8 +2786,10 @@ async function loadSummary() {
       const totalComm = totalInvest * commRate;
 
       document.getElementById(`t${level}Count`).textContent = referrals.length;
-      document.getElementById(`t${level}Invest`).textContent = `₦${totalInvest.toLocaleString()}`;
-      document.getElementById(`t${level}Comm`).textContent = `₦${totalComm.toLocaleString()}`;
+      document.getElementById(`t${level}Invest`).textContent =
+        `₦${totalInvest.toLocaleString()}`;
+      document.getElementById(`t${level}Comm`).textContent =
+        `₦${totalComm.toLocaleString()}`;
     }
   } catch (err) {
     console.error("Summary Load Error:", err);
@@ -2827,9 +2818,10 @@ async function loadTeam(level) {
     if (!userSnap.exists()) return;
 
     const userData = userSnap.data();
-    const referrals = level === 1
-      ? (userData.referrals?.level1 || [])
-      : (userData.referrals?.level2 || []);
+    const referrals =
+      level === 1
+        ? userData.referrals?.level1 || []
+        : userData.referrals?.level2 || [];
 
     if (referrals.length === 0) {
       teamListEl.innerHTML = `<p style="text-align:center; color:#888; margin-top:20px;">No members in Tier ${level} yet.</p>`;
@@ -2838,9 +2830,8 @@ async function loadTeam(level) {
 
     teamListEl.innerHTML = "";
 
-    const commPercent = level === 1
-      ? (globalRates.level1 * 100)
-      : (globalRates.level2 * 100);
+    const commPercent =
+      level === 1 ? globalRates.level1 * 100 : globalRates.level2 * 100;
 
     for (const ref of referrals) {
       const refSnap = await getDoc(doc(db, "users", ref.uid));
@@ -2849,17 +2840,21 @@ async function loadTeam(level) {
       const d = refSnap.data();
       const investments = d.investments || [];
       let totalInvestmentValue = 0;
-      investments.forEach(inv => {
+      investments.forEach((inv) => {
         totalInvestmentValue += Number(inv.price || 0);
       });
 
       const rawNum = d.number || "N/A";
-      const maskedNum = rawNum.length > 7
-        ? rawNum.substring(0, 4) + "****" + rawNum.slice(-3)
-        : rawNum;
+      const maskedNum =
+        rawNum.length > 7
+          ? rawNum.substring(0, 4) + "****" + rawNum.slice(-3)
+          : rawNum;
 
       const joinDate = ref.createdAt
-        ? new Date(ref.createdAt.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+        ? new Date(ref.createdAt.seconds * 1000).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          })
         : "N/A";
 
       const row = document.createElement("div");
@@ -2894,7 +2889,6 @@ async function loadTeam(level) {
     teamListEl.innerHTML = `<p style="text-align:center; color:#ef4444;">Failed to load team.</p>`;
   }
 }
-
 
 // REPLACE WITH THIS:
 auth.onAuthStateChanged((user) => {
@@ -2946,10 +2940,10 @@ onAuthStateChanged(auth, (user) => {
           window.open(data.officialGroup, "_blank");
         } else {
           Toast.fire({
-            icon: 'error',
-            title: 'Link Unavailable',
-            text: 'Official group link not available.',
-            confirmButtonColor: '#007bff'
+            icon: "error",
+            title: "Link Unavailable",
+            text: "Official group link not available.",
+            confirmButtonColor: "#007bff",
           });
         }
       };
@@ -2958,10 +2952,8 @@ onAuthStateChanged(auth, (user) => {
     // --- Bank info section removed because it's not needed anymore ---
     // const bank = data.bankAccount;
     // if (bank) { ... }
-
   }); // End onSnapshot
 }); // End onAuthStateChanged
-
 
 // ======================================================
 // LOAD WITHDRAWAL UI DATA
@@ -2986,7 +2978,8 @@ async function loadWithdrawData() {
     if (!userSnap.exists()) return;
 
     const data = userSnap.data();
-    document.getElementById("withdrawBalance").textContent = "₦" + (data.balance || 0).toLocaleString();
+    document.getElementById("withdrawBalance").textContent =
+      "₦" + (data.balance || 0).toLocaleString();
 
     const bank = data.bankAccount;
     const bankCard = document.getElementById("withdrawBankCard");
@@ -3018,7 +3011,7 @@ async function loadWithdrawData() {
 document.getElementById("withdrawSubmitBtn").onclick = async () => {
   const amountInput = document.getElementById("withdrawAmountInput");
   const submitBtn = document.getElementById("withdrawSubmitBtn");
-  
+
   if (!auth.currentUser) return;
 
   const userRef = doc(db, "users", auth.currentUser.uid);
@@ -3028,24 +3021,35 @@ document.getElementById("withdrawSubmitBtn").onclick = async () => {
 
   // --- 🛑 VALIDATIONS ---
   if (!bank || !bank.accountNumber || !bank.bankName || !bank.accountName) {
-    window.showToast('Bank Account Required: Please bind your bank account first!', 'warning');
+    window.showToast(
+      "Bank Account Required: Please bind your bank account first!",
+      "warning",
+    );
     return;
   }
 
-
   // ✅ ADD THIS: Check for active investment
-const investments = Array.isArray(userData.investments) ? userData.investments : [];
-const hasActiveInvestment = investments.some(inv => inv.status === "active");
+  const investments = Array.isArray(userData.investments)
+    ? userData.investments
+    : [];
+  const hasActiveInvestment = investments.some(
+    (inv) => inv.status === "active",
+  );
 
-if (!hasActiveInvestment) {
-  window.showToast('No Active Investment: You must have at least one active investment to withdraw.', 'warning');
-  return;
-}
-
+  if (!hasActiveInvestment) {
+    window.showToast(
+      "No Active Investment: You must have at least one active investment to withdraw.",
+      "warning",
+    );
+    return;
+  }
 
   const settings = window._cachedSettings || {};
   if (settings.withdrawalEnabled === false) {
-    window.showToast('Withdrawals Disabled: Currently disabled by admin.', 'warning');
+    window.showToast(
+      "Withdrawals Disabled: Currently disabled by admin.",
+      "warning",
+    );
     return;
   }
 
@@ -3054,19 +3058,28 @@ if (!hasActiveInvestment) {
   const currentBalance = userData.balance || 0;
 
   if (!amount || amount <= 0) {
-    window.showToast('Invalid Amount: Enter a valid amount!', 'warning');
+    window.showToast("Invalid Amount: Enter a valid amount!", "warning");
     return;
   }
   if (amount < minWithdrawal) {
-    window.showToast(`Amount Too Low: Minimum is ₦${minWithdrawal.toLocaleString()}`, 'warning');
+    window.showToast(
+      `Amount Too Low: Minimum is ₦${minWithdrawal.toLocaleString()}`,
+      "warning",
+    );
     return;
   }
   if (amount > currentBalance) {
-    window.showToast('Insufficient Balance: You do not have enough funds!', 'error');
+    window.showToast(
+      "Insufficient Balance: You do not have enough funds!",
+      "error",
+    );
     return;
   }
   if (userData.hasPendingWithdrawal === true) {
-    window.showToast('Pending Request: You already have a pending withdrawal request.', 'warning');
+    window.showToast(
+      "Pending Request: You already have a pending withdrawal request.",
+      "warning",
+    );
     return;
   }
 
@@ -3088,10 +3101,10 @@ if (!hasActiveInvestment) {
       const freshUserSnap = await transaction.get(userRef);
       const freshBalance = freshUserSnap.data().balance || 0;
       if (amount > freshBalance) throw new Error("Insufficient balance");
-      
-      transaction.update(userRef, { 
-        balance: freshBalance - amount, 
-        hasPendingWithdrawal: true 
+
+      transaction.update(userRef, {
+        balance: freshBalance - amount,
+        hasPendingWithdrawal: true,
       });
     });
 
@@ -3107,16 +3120,19 @@ if (!hasActiveInvestment) {
       accountNumber: bank.accountNumber,
       accountName: bank.accountName,
       createdAt: serverTimestamp(),
-      note: "Manual request waiting for admin approval"
+      note: "Manual request waiting for admin approval",
     });
 
-    window.showToast('Submitted: Your request is now with the admin for approval.', 'success');
-    document.getElementById("withdrawBalance").textContent = "₦" + (currentBalance - amount).toLocaleString();
+    window.showToast(
+      "Submitted: Your request is now with the admin for approval.",
+      "success",
+    );
+    document.getElementById("withdrawBalance").textContent =
+      "₦" + (currentBalance - amount).toLocaleString();
     amountInput.value = "";
-    
   } catch (err) {
     console.error("Processing Error:", err);
-    window.showToast('Failed: Please try again later.', 'error');
+    window.showToast("Failed: Please try again later.", "error");
   } finally {
     submitBtn.innerText = "Withdraw Funds";
     submitBtn.disabled = false;
@@ -3128,19 +3144,20 @@ const recordsPage = document.getElementById("recordsPage");
 if (recordsPage) {
   const filterBtns = recordsPage.querySelectorAll(".filter-btn");
 
-  filterBtns.forEach(btn => {
+  filterBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-
       // active state only inside records page
-      filterBtns.forEach(b => b.classList.remove("active"));
+      filterBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
 
       const type = btn.dataset.type.toLowerCase();
 
       const cards = recordsPage.querySelectorAll(".record-card");
 
-      cards.forEach(card => {
-        const text = card.querySelector(".record-transaction")?.innerText.toLowerCase() || "";
+      cards.forEach((card) => {
+        const text =
+          card.querySelector(".record-transaction")?.innerText.toLowerCase() ||
+          "";
 
         if (type === "all") {
           card.style.display = "flex";
@@ -3148,11 +3165,9 @@ if (recordsPage) {
           card.style.display = text.includes(type) ? "flex" : "none";
         }
       });
-
     });
   });
 }
-
 
 // Helper to match the icon and style
 function getIconConfig(type = "") {
@@ -3166,9 +3181,9 @@ function getIconConfig(type = "") {
 // Helper for date formatting: "Apr 19, 2026, 09:41 AM"
 function formatRecordDate(date) {
   if (!date) return "-";
-  const options = { month: 'short', day: '2-digit', year: 'numeric' };
-  const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-  return `${date.toLocaleDateString('en-US', options)}, ${date.toLocaleTimeString('en-US', timeOptions)}`;
+  const options = { month: "short", day: "2-digit", year: "numeric" };
+  const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: true };
+  return `${date.toLocaleDateString("en-US", options)}, ${date.toLocaleTimeString("en-US", timeOptions)}`;
 }
 
 // 1. Registration Bonus (Static Hard-coded Card)
@@ -3198,14 +3213,14 @@ async function loadRecords(container) {
         <div class="record-status status-success">Confirmed</div>
       </div>
     </div>
-    `
+    `,
   );
 
   // 🚀 SWITCHED: 'withdrawals' database targets coreNextDb now instead of transactionDb
   const collections = [
     { name: "withdrawals", label: "Withdrawal", database: coreNextDb },
     { name: "deposits", label: "Deposit", database: transactionDb },
-    { name: "records", label: "Commission", database: transactionDb }
+    { name: "records", label: "Commission", database: transactionDb },
   ];
 
   collections.forEach(({ name, label, database }) => {
@@ -3267,9 +3282,10 @@ async function loadRecords(container) {
 
         // ---------------- AMOUNT ----------------
         // Use originalAmount if it's a withdrawal, otherwise fall back to amount
-        const amount = (name === "withdrawals") 
-          ? (data.originalAmount ?? data.amount ?? 0) 
-          : (data.amount ?? 0);
+        const amount =
+          name === "withdrawals"
+            ? (data.originalAmount ?? data.amount ?? 0)
+            : (data.amount ?? 0);
 
         const isWithdrawal = name === "withdrawals";
         const amountSign = isWithdrawal ? "-" : "+";
@@ -3307,11 +3323,10 @@ async function loadRecords(container) {
   });
 }
 
-
 document.querySelector(".settings-item")?.addEventListener("click", () => {
   // Hide all pages safely
   if (pages && pages.length) {
-    pages.forEach(p => {
+    pages.forEach((p) => {
       if (p) p.style.display = "none";
     });
   }
@@ -3325,15 +3340,12 @@ document.querySelector(".settings-item")?.addEventListener("click", () => {
   loadRecords(container);
 });
 
-
-
-
 const withdrawalBtn = document.getElementById("withdrawalBtn");
 
 withdrawalBtn?.addEventListener("click", () => {
   // Hide all pages safely
   if (pages && pages.length) {
-    pages.forEach(p => {
+    pages.forEach((p) => {
       if (p) p.style.display = "none";
     });
   }
@@ -3353,7 +3365,6 @@ withdrawalBtn?.addEventListener("click", () => {
   loadWithdrawalRecords(container);
 });
 
-
 async function loadWithdrawalRecords(container) {
   if (!container) return;
   container.innerHTML = "";
@@ -3363,12 +3374,12 @@ async function loadWithdrawalRecords(container) {
 
   // 🚀 SWITCHED TO NEW DATABASE: Point query listener to coreNextDb instead of transactionDb
   const colRef = query(
-    collection(coreNextDb, "withdrawals"), 
-    where("uid", "==", user.uid)
+    collection(coreNextDb, "withdrawals"),
+    where("uid", "==", user.uid),
   );
 
-  onSnapshot(colRef, snapshot => {
-    snapshot.docChanges().forEach(change => {
+  onSnapshot(colRef, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
       if (change.type !== "added") return;
 
       const rowId = `withdrawals-${change.doc.id}`;
@@ -3390,15 +3401,13 @@ async function loadWithdrawalRecords(container) {
 
       if (s === "success" || s === "approved") {
         statusText = "Confirmed";
-        statusClass = "status-success"; 
-      } 
-      else if (s === "failed" || s === "declined") {
+        statusClass = "status-success";
+      } else if (s === "failed" || s === "declined") {
         statusText = "Failed";
-        statusClass = "status-failed"; 
-      } 
-      else if (s === "processing") {
+        statusClass = "status-failed";
+      } else if (s === "processing") {
         statusText = "Processing";
-        statusClass = "status-pending"; 
+        statusClass = "status-pending";
       }
 
       // ---------------- TIME FORMATTING ----------------
@@ -3407,10 +3416,18 @@ async function loadWithdrawalRecords(container) {
       if (time?.toDate) time = time.toDate();
       else if (time) time = new Date(time);
 
-      const formattedDate = time ? 
-        time.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + 
-        ", " + 
-        time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+      const formattedDate = time
+        ? time.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          }) +
+          ", " +
+          time.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
         : "-";
 
       // ---------------- AMOUNT ----------------
@@ -3433,12 +3450,12 @@ async function loadWithdrawalRecords(container) {
           </div>
 
           <div class="record-right">
-            <div class="record-amount amount-minus">-₦${Number(amount).toLocaleString(undefined, {minimumFractionDigits: 0})}</div>
+            <div class="record-amount amount-minus">-₦${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 0 })}</div>
             <div class="record-status ${statusClass}">${statusText}</div>
           </div>
 
         </div>
-        `
+        `,
       );
     });
   });
@@ -3449,7 +3466,7 @@ const depositBtn = document.getElementById("depositBtnrec");
 depositBtn?.addEventListener("click", () => {
   // Hide all pages safely
   if (pages && pages.length) {
-    pages.forEach(p => {
+    pages.forEach((p) => {
       if (p) p.style.display = "none";
     });
   }
@@ -3469,9 +3486,6 @@ depositBtn?.addEventListener("click", () => {
   loadDepositRecords(container); // Only deposits
 });
 
-
-
-
 async function loadDepositRecords(container) {
   if (!container) return;
   container.innerHTML = "";
@@ -3482,12 +3496,12 @@ async function loadDepositRecords(container) {
   // ✅ HEAVY LOAD DB: Switched from 'db' to 'transactionDb'
   // ✅ FIELD FIX: Changed 'userId' to 'uid' to match storage logic
   const colRef = query(
-    collection(transactionDb, "deposits"), 
-    where("uid", "==", user.uid)
+    collection(transactionDb, "deposits"),
+    where("uid", "==", user.uid),
   );
 
-  onSnapshot(colRef, snapshot => {
-    snapshot.docChanges().forEach(change => {
+  onSnapshot(colRef, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
       if (change.type !== "added") return;
 
       const rowId = `deposits-${change.doc.id}`;
@@ -3509,15 +3523,13 @@ async function loadDepositRecords(container) {
 
       if (s === "success" || s === "approved") {
         statusText = "Confirmed";
-        statusClass = "status-success"; 
-      } 
-      else if (s === "failed" || s === "declined") {
+        statusClass = "status-success";
+      } else if (s === "failed" || s === "declined") {
         statusText = "Failed";
-        statusClass = "status-failed"; 
-      } 
-      else if (s === "processing") {
+        statusClass = "status-failed";
+      } else if (s === "processing") {
         statusText = "Processing";
-        statusClass = "status-pending"; 
+        statusClass = "status-pending";
       }
 
       // ---------------- TIME FORMATTING ----------------
@@ -3526,10 +3538,18 @@ async function loadDepositRecords(container) {
       if (time?.toDate) time = time.toDate();
       else if (time) time = new Date(time);
 
-      const formattedDate = time ? 
-        time.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + 
-        ", " + 
-        time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+      const formattedDate = time
+        ? time.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          }) +
+          ", " +
+          time.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
         : "-";
 
       // ---------------- AMOUNT ----------------
@@ -3554,12 +3574,12 @@ async function loadDepositRecords(container) {
           </div>
 
           <div class="record-right">
-            <div class="record-amount ${amountClass}">${amountSign}₦${Number(amount).toLocaleString(undefined, {minimumFractionDigits: 0})}</div>
+            <div class="record-amount ${amountClass}">${amountSign}₦${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 0 })}</div>
             <div class="record-status ${statusClass}">${statusText}</div>
           </div>
 
         </div>
-        `
+        `,
       );
     });
   });
@@ -3570,7 +3590,7 @@ const incomeBtn = document.getElementById("incomeBtn");
 incomeBtn?.addEventListener("click", () => {
   // Hide all pages safely
   if (pages && pages.length) {
-    pages.forEach(p => {
+    pages.forEach((p) => {
       if (p) p.style.display = "none";
     });
   }
@@ -3590,7 +3610,6 @@ incomeBtn?.addEventListener("click", () => {
   loadIncomeRecords(container); // Only investment profit
 });
 
-
 async function loadIncomeRecords(container) {
   if (!container) return;
   container.innerHTML = ""; // clear previous records
@@ -3601,11 +3620,11 @@ async function loadIncomeRecords(container) {
   // ---------------- GET INVESTMENT PROFIT RECORDS ----------------
   const colRef = query(
     collection(db, "users", user.uid, "records"),
-    where("type", "==", "Investment Profit")
+    where("type", "==", "Investment Profit"),
   );
 
-  onSnapshot(colRef, snapshot => {
-    snapshot.docChanges().forEach(change => {
+  onSnapshot(colRef, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
       if (change.type !== "added") return;
 
       const rowId = `income-${change.doc.id}`;
@@ -3627,16 +3646,24 @@ async function loadIncomeRecords(container) {
       if (time?.toDate) time = time.toDate();
       else if (time) time = new Date(time);
 
-      const formattedDate = time ? 
-        time.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + 
-        ", " + 
-        time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+      const formattedDate = time
+        ? time.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          }) +
+          ", " +
+          time.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
         : "-";
 
       // ---------------- AMOUNT ----------------
       const amount = data.amount ?? 0;
       const amountSign = "+";
-      const amountClass = "amount-plus"; 
+      const amountClass = "amount-plus";
 
       // ---------------- UI RENDER ----------------
       container.insertAdjacentHTML(
@@ -3654,29 +3681,25 @@ async function loadIncomeRecords(container) {
           </div>
 
           <div class="record-right">
-            <div class="record-amount ${amountClass}">${amountSign}₦${Number(amount).toLocaleString(undefined, {minimumFractionDigits: 0})}</div>
+            <div class="record-amount ${amountClass}">${amountSign}₦${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 0 })}</div>
             <div class="record-status ${statusClass}">${statusText}</div>
           </div>
 
         </div>
-        `
+        `,
       );
     });
   });
 }
 
-
-
-
-
-
-
 const commissionBtn = document.getElementById("commissionBtn");
 
 commissionBtn?.addEventListener("click", () => {
   // Hide all pages safely
-  if (typeof pages !== 'undefined' && pages.length) {
-    pages.forEach(p => { if (p) p.style.display = "none"; });
+  if (typeof pages !== "undefined" && pages.length) {
+    pages.forEach((p) => {
+      if (p) p.style.display = "none";
+    });
   }
 
   // Hide navbar
@@ -3694,8 +3717,6 @@ commissionBtn?.addEventListener("click", () => {
   loadCommissionRecords(container);
 });
 
-
-
 async function loadCommissionRecords(container) {
   if (!container) return;
   container.innerHTML = `<p style="text-align:center; padding:20px; color:#64748b;">Loading commissions...</p>`;
@@ -3705,15 +3726,15 @@ async function loadCommissionRecords(container) {
 
   // ✅ Point specifically to the 'records' collection in Heavy Load DB
   const colRef = query(
-    collection(transactionDb, "records"), 
-    where("uid", "==", user.uid)
+    collection(transactionDb, "records"),
+    where("uid", "==", user.uid),
   );
 
-  onSnapshot(colRef, snapshot => {
+  onSnapshot(colRef, (snapshot) => {
     // Clear the loader if data exists
     if (!snapshot.empty) container.innerHTML = "";
 
-    snapshot.docChanges().forEach(change => {
+    snapshot.docChanges().forEach((change) => {
       if (change.type !== "added") return;
 
       const rowId = `commission-${change.doc.id}`;
@@ -3723,17 +3744,25 @@ async function loadCommissionRecords(container) {
 
       // ---------------- ICON ----------------
       // Using a purple/gold style for commissions
-      const iconConfig = { class: "record-icon-commission", icon: "fa-gift" }; 
+      const iconConfig = { class: "record-icon-commission", icon: "fa-gift" };
 
       // ---------------- TIME ----------------
       let time = data.timestamp || data.createdAt;
       if (time?.toDate) time = time.toDate();
       else if (time) time = new Date(time);
 
-      const formattedDate = time ? 
-        time.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + 
-        ", " + 
-        time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+      const formattedDate = time
+        ? time.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          }) +
+          ", " +
+          time.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
         : "Recent";
 
       // ---------------- UI RENDER ----------------
@@ -3748,7 +3777,7 @@ async function loadCommissionRecords(container) {
           <div class="record-middle">
             <div class="record-transaction" style="font-weight:700;">Affiliate Reward</div>
             <div style="font-size:11px; color:#64748b; margin-bottom:2px;">
-                From: ${data.refNumber || 'Referral'} (Level ${data.level || '1'})
+                From: ${data.refNumber || "Referral"} (Level ${data.level || "1"})
             </div>
             <div class="record-time">${formattedDate}</div>
           </div>
@@ -3760,40 +3789,44 @@ async function loadCommissionRecords(container) {
             <div class="record-status status-success" style="background: #ecfdf5; color: #10b981; padding: 2px 8px; border-radius: 4px; font-size: 10px;">Confirmed</div>
           </div>
         </div>
-        `
+        `,
       );
     });
 
     if (snapshot.empty) {
-        container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">No commissions earned yet.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">No commissions earned yet.</div>`;
     }
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Select the grid buttons and input
-  const amountOptions = document.querySelectorAll('.amount-option');
-  const customAmountInput = document.getElementById('customAmount');
-  const selectedAmountDisplay = document.getElementById('selectedAmountDisplay');
+  const amountOptions = document.querySelectorAll(".amount-option");
+  const customAmountInput = document.getElementById("customAmount");
+  const selectedAmountDisplay = document.getElementById(
+    "selectedAmountDisplay",
+  );
 
   // Optional: update header display
-  const headerSelectedAmount = document.getElementById('headerSelectedAmount');
+  const headerSelectedAmount = document.getElementById("headerSelectedAmount");
 
   let selectedAmount = 0;
 
   function updateSelectedAmountDisplay() {
-  const formatted = selectedAmount ? `₦${Number(selectedAmount).toLocaleString()}` : '₦0';
+    const formatted = selectedAmount
+      ? `₦${Number(selectedAmount).toLocaleString()}`
+      : "₦0";
 
-  const display = document.getElementById("selectedAmountDisplay");
-  if (display) display.textContent = formatted;
+    const display = document.getElementById("selectedAmountDisplay");
+    if (display) display.textContent = formatted;
 
-  const headerDisplay = document.getElementById("headerSelectedAmount");
-  if (headerDisplay) headerDisplay.textContent = formatted;
-}
+    const headerDisplay = document.getElementById("headerSelectedAmount");
+    if (headerDisplay) headerDisplay.textContent = formatted;
+  }
 
   // ===== Grid Amount Click =====
-  amountOptions.forEach(option => {
-    option.addEventListener('click', () => {
+  amountOptions.forEach((option) => {
+    option.addEventListener("click", () => {
       selectedAmount = option.dataset.value;
 
       // Fill custom input with the clicked amount
@@ -3803,27 +3836,22 @@ document.addEventListener('DOMContentLoaded', () => {
       updateSelectedAmountDisplay();
 
       // Highlight active grid button
-      amountOptions.forEach(o => o.classList.remove('active'));
-      option.classList.add('active');
+      amountOptions.forEach((o) => o.classList.remove("active"));
+      option.classList.add("active");
     });
   });
 
   // ===== Custom Amount Input =====
-  customAmountInput.addEventListener('input', () => {
+  customAmountInput.addEventListener("input", () => {
     selectedAmount = customAmountInput.value;
 
     // Update top display
     updateSelectedAmountDisplay();
 
     // Remove active class from grid buttons
-    amountOptions.forEach(o => o.classList.remove('active'));
+    amountOptions.forEach((o) => o.classList.remove("active"));
   });
 });
-
-
-
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
   const nav = document.getElementById("bottomNav");
@@ -3846,12 +3874,9 @@ document.addEventListener("DOMContentLoaded", function () {
   nav.style.zIndex = "99999";
 });
 
-
-
-
 // Scroll to last content in records page
 function scrollToBottom() {
-  const recordsPage = document.querySelector('.records-page');
+  const recordsPage = document.querySelector(".records-page");
   if (recordsPage) {
     recordsPage.scrollTop = recordsPage.scrollHeight;
   }
@@ -3860,12 +3885,6 @@ function scrollToBottom() {
 // Call after content is loaded or updated
 scrollToBottom();
 
-
-
-
-
-
-
 async function backfillInvestmentRecords(userId) {
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
@@ -3873,10 +3892,10 @@ async function backfillInvestmentRecords(userId) {
   if (!userSnap.exists()) return;
 
   const userData = userSnap.data();
-  
+
   // ✅ QUOTA SAVER: If this user was already patched, STOP here.
   // This prevents hitting the database with 'updateDoc' every single login.
-  if (userData.isPatched) return; 
+  if (userData.isPatched) return;
 
   const investments = userData.investments || [];
   let needsUpdate = false;
@@ -3892,7 +3911,7 @@ async function backfillInvestmentRecords(userId) {
   if (needsUpdate) {
     await updateDoc(userRef, {
       investments: updatedInvestments,
-      isPatched: true // ✅ Mark as patched forever
+      isPatched: true, // ✅ Mark as patched forever
     });
     console.log("User patched successfully.");
   } else {
@@ -3900,7 +3919,6 @@ async function backfillInvestmentRecords(userId) {
     await updateDoc(userRef, { isPatched: true });
   }
 }
-
 
 // ✅ PLACE THIS OUTSIDE ALL OTHER FUNCTIONS (Global Scope)
 function toggleVisibility(inputId, iconEl) {
@@ -3922,13 +3940,12 @@ function toggleVisibility(inputId, iconEl) {
 // ONLY DO THIS IF YOU USE type="module"
 window.toggleVisibility = toggleVisibility;
 
-
 // --- POPULATE BANKS IMMEDIATELY ---
-document.addEventListener("DOMContentLoaded", function() {
-    const bankSelect = document.getElementById("bankName");
+document.addEventListener("DOMContentLoaded", function () {
+  const bankSelect = document.getElementById("bankName");
 
-    // Filtered Bank List explicitly matching your live Payrant API Payload
-const banks = [
+  // Filtered Bank List explicitly matching your live Payrant API Payload
+  const banks = [
     { name: "5TT MFB", code: "090832" },
     { name: "78 FINANCE COMPANY LIMITED", code: "110072" },
     { name: "9 PSB", code: "120001" },
@@ -4564,24 +4581,23 @@ const banks = [
     { name: "ZENITH Mobile", code: "100018" },
     { name: "Zikora Microfinance bank", code: "090504" },
     { name: "ZION MICROFINANCE BANK", code: "090384" },
-    { name: "Zitra MFB", code: "090718" }
-    
-];
+    { name: "Zitra MFB", code: "090718" },
+  ];
 
-    // Clear existing options first
-    bankSelect.innerHTML = '<option value="" disabled selected>Select your bank...</option>';
+  // Clear existing options first
+  bankSelect.innerHTML =
+    '<option value="" disabled selected>Select your bank...</option>';
 
-    // Loop through and add them
-    banks.forEach(bank => {
-        const option = document.createElement("option");
-        option.value = bank.code;
-        option.textContent = bank.name;
-        bankSelect.appendChild(option);
-    });
+  // Loop through and add them
+  banks.forEach((bank) => {
+    const option = document.createElement("option");
+    option.value = bank.code;
+    option.textContent = bank.name;
+    bankSelect.appendChild(option);
+  });
 
-    console.log("Banks loaded successfully!");
+  console.log("Banks loaded successfully!");
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   // Select all navigation items within your bottom nav track
@@ -4595,7 +4611,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 2. Remove the 'active' class from whichever item currently has it
-      const currentActive = document.querySelector("#bottomNav .nav-item.active");
+      const currentActive = document.querySelector(
+        "#bottomNav .nav-item.active",
+      );
       if (currentActive) {
         currentActive.classList.remove("active");
       }
