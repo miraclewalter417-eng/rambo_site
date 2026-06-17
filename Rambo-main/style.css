@@ -391,7 +391,7 @@ body {
   width: 100%;
   max-width: 400px; /* Locked to standard compact mobile flow width */
   margin: 0 auto;
-  padding: 14px;
+  padding: 16px;
   box-sizing: border-box;
   background: transparent; /* No heavy external background container boxes */
 }
@@ -457,8 +457,8 @@ body {
 
 /* COMPACT VECTOR ICONS (Not too big, exactly matches sample layout) */
 .action-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   transition: transform 0.2s ease;
 }
 
@@ -892,16 +892,16 @@ body {
 
 /* ================= THE ELECTRIC CYAN ACTIVE MATRIX ================= */
 .nav-item.active {
-  color: var(--accent-cyan); /* Glowing Electric Cyan focal reference */
+  /* color: var(--accent-cyan); Glowing Electric Cyan focal reference */
 }
 
 .nav-item.active .nav-icon-wrapper {
-  background: var(--accent-glow); /* Soft electric neon aura behind active component */
-  color: var(--accent-cyan);
+  /* background: var(--accent-glow); Soft electric neon aura behind active component */
+  /* color: var(--accent-cyan); */
 }
 
 .nav-item.active .nav-label-text {
-  color: var(--accent-cyan); /* Active label text matches indicator color */
+  /* color: var(--accent-cyan); Active label text matches indicator color */
   font-weight: 700;
 }
 
@@ -3020,7 +3020,7 @@ body {
   justify-content: center;
   padding: 0 16px;
   /* Swapped Red for Brand Purple Gradient */
-  background: linear-gradient(135deg, #050b18 0%, #050b18 100%);
+  background: linear-gradient(135deg, green 50%, #fff 100%);
   color: #111827;
   z-index: 1000;
   border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -3103,7 +3103,7 @@ box-shadow: 0 8px 32px rgba(3, 3, 3, 0.05); /* Very subtle purple tint in shadow
 
 /* The Main Tier Cards (Team 1 & Team 2) */
 .tier-card-main {
-    background: linear-gradient(145deg, #0a101e, #121826);
+   background: linear-gradient(135deg, green 50%, #fff 100%);
     border: 1px solid #1c2333;
     border-radius: 20px;
     padding: 20px;
@@ -3348,7 +3348,7 @@ body {
 
 /* ================= 2. INPUT CARD ================= */
 .input-card-ev {
-  background: #0d1626;
+   background: linear-gradient(135deg, green 50%, #fff 100%);
   border: 1px solid #1c2e4a;
   border-radius: 20px;
   padding: 20px;
@@ -3370,7 +3370,7 @@ body {
 }
 
 .withdraw-input-box-ev {
-  background: #070e1b;
+  background: white;
   border: 1px solid #1c2e4a;
   border-radius: 12px;
   padding: 15px;
@@ -3590,7 +3590,7 @@ body {
   left: 0;
   width: 100%;
   height: 60px;
-  background: #ffffff; /* Clean white background */
+  background: black; /* Clean white background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3604,7 +3604,7 @@ body {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #fff6e5; /* Dark Navy for high contrast */
+  color: green; /* Dark Navy for high contrast */
   letter-spacing: 0.5px;
 }
 
@@ -3616,7 +3616,7 @@ body {
   height: 40px;
   border-radius: 50%;
   border: 1px solid #e5e7eb; /* Subtle border like the image */
-  background: #ffffff;
+  background: green;
   color: #fff6e5;
   display: flex;
   align-items: center;
@@ -3641,7 +3641,7 @@ body {
 
 #recordsContainer {
   padding: 15px;
-  background-color: #f3e8ff; /* Dark background like the screenshot */
+  background-color: white; /* Dark background like the screenshot */
   min-height: 100vh;
 }
 
