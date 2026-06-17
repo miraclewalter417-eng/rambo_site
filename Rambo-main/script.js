@@ -485,7 +485,7 @@ signupContainer.classList.add('active');
 
 
 // --- GLOBAL CONFIG & LOCKS ---
-const MS_IN_DAY = 24 * 60 * 60 * 1000;
+const MS_IN_DAY = 20 * 60 * 60 * 1000; // 20-hour income cycle
 let isSyncingNow = false; // 🔒 The "Guard" that stops double drops
 
 // ====================== AUTO-FILL REFERRAL ======================
@@ -1803,7 +1803,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboard = document.getElementById("dashboard");
   const investmentBackBtn = document.getElementById("investmentBackBtn");
 
-  const MS_IN_DAY = 24 * 60 * 60 * 1000;
+  const MS_IN_DAY = 20 * 60 * 60 * 1000; // 20-hour income cycle
   let countdownIntervals = [];
 
   // ================= BACK BUTTON =================

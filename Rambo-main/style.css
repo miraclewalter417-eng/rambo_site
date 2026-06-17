@@ -831,8 +831,8 @@ body {
   bottom: 0; /* Tied directly to base of viewport with zero floating gaps */
   left: 0;
   width: 100%;
-  background: #ffffff; /* True charcoal premium block surface */
-  border-top: 1px solid #1f293d; /* High contrast structural accent barrier */
+  background: #e8e8e8; /* Dark white background */
+  border-top: 1px solid #d0d0d0; /* Subtle light border */
   z-index: 9999;
   box-sizing: border-box;
   padding-bottom: env(safe-area-inset-bottom, 0px); /* Clean layout padding for modern screen tracks */
@@ -848,6 +848,7 @@ body {
   align-items: center;
   justify-items: center;
   box-sizing: border-box;
+  background: #e8e8e8; /* Dark white - matches nav background */
 }
 
 /* ================= NAV ITEMS GRID INTERFACES ================= */
@@ -861,7 +862,6 @@ body {
   height: 100%;
   gap: 4px;
   color: #64748b; /* Clean inactive silver slate tone */
-  transition: color 0.15s ease, transform 0.1s ease;
   -webkit-tap-highlight-color: transparent;
   position: relative;
 }
@@ -874,7 +874,7 @@ body {
   width: 48px;
   height: 28px;
   border-radius: 14px; /* Matches layout pill profile from screen track references */
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: none;
 }
 
 .nav-icon-wrapper svg {
@@ -905,10 +905,7 @@ body {
   font-weight: 700;
 }
 
-/* Clean UI Haptic Pressure Indicator */
-.nav-item:active {
-  transform: scale(0.93);
-}
+/* Clean UI Haptic Pressure Indicator — Removed */
 
 
 /* ================= THE FIX: AUTOMATIC SCROLL SPACING OFFSET ================= */
