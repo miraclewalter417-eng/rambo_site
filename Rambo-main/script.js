@@ -68,32 +68,35 @@ import {
 
 // 1. MAIN Database Config (The one you've been using)
 const mainConfig = {
-  apiKey: "AIzaSyC4CxP4u0iBkwZt_2kBxJ4CA-NAmpBhOgY",
-  authDomain: "new-site-23306.firebaseapp.com",
-  projectId: "new-site-23306",
-  storageBucket: "new-site-23306.firebasestorage.app",
-  messagingSenderId: "215473215537",
-  appId: "1:215473215537:web:5a6c571bfb837ee64c9d10"
+  apiKey: "AIzaSyAZmHDphXh9nog-AKKYDEjRMGFBesPX5FA",
+  authDomain: "mimiads-market.firebaseapp.com",
+  projectId: "mimiads-market",
+  storageBucket: "mimiads-market.firebasestorage.app",
+  messagingSenderId: "336481233471",
+  appId: "1:336481233471:web:3d937c108c4156c022e68a",
+  measurementId: "G-0W9N3L6KYB"
 };
 
 // 2. HEAVY LOAD Database Config (The new one for Deposits/Withdrawals)
 const heavyLoadConfig = {
-  apiKey: "AIzaSyCs0cmFzYiBYdj2qJXiUWdg4-ui5iAfVz4",
-  authDomain: "heavyload-d40b7.firebaseapp.com",
-  projectId: "heavyload-d40b7",
-  storageBucket: "heavyload-d40b7.firebasestorage.app",
-  messagingSenderId: "685246494163",
-  appId: "1:685246494163:web:f2dc97e1805fa2142c2b26"
+  apiKey: "AIzaSyB31b1NhUPNpTFlxe8FpwrDu6kiwKR5IhA",
+  authDomain: "oga-viral.firebaseapp.com",
+  projectId: "oga-viral",
+  storageBucket: "oga-viral.firebasestorage.app",
+  messagingSenderId: "1003908808185",
+  appId: "1:1003908808185:web:e6378ca372888d2080d128",
+  measurementId: "G-E48F3DS2CP"
 };
 
 // 3. CORE NEXT Database Config (The third instance)
 const coreNextConfig = {
-  apiKey: "AIzaSyAFo9GUkLlHAXYsxErF4IocNGwNQ7NpqyQ",
-  authDomain: "core-next-61bc9.firebaseapp.com",
-  projectId: "core-next-61bc9",
-  storageBucket: "core-next-61bc9.firebasestorage.app",
-  messagingSenderId: "339200335484",
-  appId: "1:339200335484:web:d4723e1a7d5146dc0e33f9"
+  apiKey: "AIzaSyAlglNiJCX2BDC-RfbD_438f26r6L8Kq7w",
+  authDomain: "ads-manager-b7cf2.firebaseapp.com",
+  projectId: "ads-manager-b7cf2",
+  storageBucket: "ads-manager-b7cf2.firebasestorage.app",
+  messagingSenderId: "45297966034",
+  appId: "1:45297966034:web:58941a5de594dfabec460b",
+  measurementId: "G-N0MY6616BK"
 };
 // --- INITIALIZATION ---
 
