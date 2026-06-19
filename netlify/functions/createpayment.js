@@ -78,7 +78,7 @@ const PAYMENT_KEY = process.env.DEPOSIT_KEY; // Use the Deposit Key here!
     amount: parseFloat(amount),
     status: "pending",
     timestamp: FieldValue.serverTimestamp(),
-    gateway: "NekPayment",
+    gateway: "payrant",
 
     // ✅ CLEAN EXPIRY
     expiresAt: Date.now() + (15 * 60 * 1000),
