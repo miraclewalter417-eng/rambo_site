@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <title>RAMBO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="shortcut icon" href="Rambo logo.jpg" type="image/x-icon">
+  
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+
+</head>
+<body>
+ 
+<!-- Custom Alert Container -->
+<div id="customAlert" class="custom-alert"></div>
+
+
+
+<div id="pageLoader" style="display: none;">
+  <div class="premium-loader-container">
+    <div class="loader-visual-wrapper">
+      <div class="loader-spinner-ring outer"></div>
+      <div class="loader-spinner-ring inner"></div>
+      <div class="loader-logo-container">
+        <div class="loader-logo-shape"></div>
+      </div>
+    </div>
+    <div class="loader-brand-title">RAMBO</div>
+    <div class="loader-status-text">SYSTEM SECURING...</div>
+    <div class="loader-progress-bar">
+      <div class="loader-progress-fill"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="honda-auth-container active" id="loginContainer">
+    <div class="fieldmark-card">
+        
+        <div class="fieldmark-header">
+            <div class="fieldmark-logo-wrapper">
+                <div class="fieldmark-logo-shape"></div>
+                <span class="fieldmark-logo-text">RAMBO</span>
+            </div>
+            <h2 class="fieldmark-title">Welcome back</h2>
+        </div>
+
+        <form id="loginForm" class="fieldmark-form">
+            <div class="fieldmark-input-group">
+                <label for="loginNumber">Phone Number</label>
+                <div class="fieldmark-field-box">
+                    <input type="text" id="loginNumber" placeholder="08012345678" required>
+                </div>
+            </div>
+
+            <div class="fieldmark-input-group">
+                <label for="loginPassword">Password</label>
+                <div class="fieldmark-field-box">
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <button type="button" class="eye-toggle" data-target="loginPassword">
+                        <i class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="fieldmark-btn-submit">Log In</button>
+        </form>
+
+        <div class="fieldmark-switch-action">
+            <span>Don't have an account?</span>
+            <button class="fieldmark-link-btn" onclick="showSignup()">Sign Up</button>
+        </div>
+    </div>
+</div>
+
+<div class="honda-auth-container" id="signupContainer">
+    <div class="fieldmark-card">
+        
+        <div class="fieldmark-header">
+            <div class="fieldmark-logo-wrapper">
+                <div class="fieldmark-logo-shape"></div>
+                <span class="fieldmark-logo-text">RAMBO</span>
+            </div>
+            <h2 class="fieldmark-title">Create an Account</h2>
+        </div>
+
+        <form id="signupForm" class="fieldmark-form">
+            <div class="fieldmark-input-group">
+                <label for="number">Phone Number</label>
+                <div class="fieldmark-field-box">
+                    <input type="text" id="number" maxlength="11" placeholder="08012345678" required>
+                </div>
+            </div>
+
+            <div class="fieldmark-input-group">
+                <label for="password">Password</label>
+                <div class="fieldmark-field-box">
+                    <input type="password" id="password" placeholder="Create password (min 8 characters)" required>
+                    <button type="button" class="eye-toggle" data-target="password">
+                        <i class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="fieldmark-input-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="fieldmark-field-box">
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                    <button type="button" class="eye-toggle" data-target="confirmPassword">
+                        <i class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="fieldmark-input-group">
+                <label for="referral">Referral Code (Optional)</label>
+                <div class="fieldmark-field-box">
+                    <input type="text" id="referral" placeholder="Enter referral code if any">
+                </div>
+            </div>
+
+            <button type="submit" class="fieldmark-btn-submit">Register now</button>
+        </form>
+
+        <div class="fieldmark-switch-action">
+            <span>Already have an account?</span>
+            <button class="fieldmark-link-btn" onclick="showLogin()">Log In</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+
+<div class="live-payout-container">
+  <div class="live-indicator">
+    <span class="live-dot"></span>
+    <span class="live-label">LIVE</span>
+  </div>
+  <div class="payout-ticker">
+    <span id="payoutText">Initializing live payouts...</span>
+  </div>
+</div>
+
+<div class="flyer-container">
+  <div class="balance-flyer">
+    <div class="flyer-slider" id="flyerSlider">
+      <img src="Rambo logo.jpg" class="flyer-card" alt="Slide 1">
+      <img src="Rambo flyer.jpg" class="flyer-card" alt="Slide 2">
+    </div>
+  </div>
+</div>
+
+
+<div class="main-container">
+  <div class="action-grid">
+    
+    <div class="action-card" id="mainRechargeTrigger">
+      <div>
+          <i style="font-size: 20px;" class="fa-solid fa-wallet"></i>
+      </div>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span class="action-text text-cyan">Deposit</span>
+    </div>
+
+    <div class="action-card" id="withdrawBtn">
+      <div style="background-color: #eef4ff;">
+      <i style="color: #1285f4; font-size: 20px;" class="fa-solid fa-credit-card"></i>
+      </div>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span class="action-text text-green">Withdraw</span>
+    </div>
+
+    <div class="action-card" id="refCard">
+      <div style="background-color: #f4edff;">
+      <i style="color: #8b5cf6; font-size: 20px;" class="fa-solid fa-users"></i>
+      </div>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span class="action-text text-orange">My Team</span>
+    </div>
+
+    <div class="action-card" id="giftCodeBtn">
+      <div style="background-color: #ffeef5;">
+      <i class="fa-solid fa-circle-check" style="color: #00e676; font-size: 20px;"></i>
+      </div>
+        <polyline points="20 12 20 22 4 22 4 12"/>
+        <rect x="2" y="7" width="20" height="5"/>
+        <line x1="12" y1="22" x2="12" y2="7"/>
+        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      <span class="action-text text-purple">Checkin</span>
+    </div>
+
+  
+
+  </div>
+
+</div>
+
+
+<div class="product-section">
+  <h2 style="color: green;" class="product-section-title">Our Investment Products</h2>
+  
+  <div class="product-list-container">
+    <div class="product-list" id="dynamicProductList">
+      <p style="color: #64748b; padding: 20px;">Loading investments...</p>
+    </div>
+  </div>
+</div>
+
+<div class="secure_box">
+  <h1>24/7</h1>
+  <p>Support</p>
+</div>
+  
+
+</div>
+<!-- END DASHBOARD -->
+
+
+
+<div class="profile-page" id="profilePage" style="display:none;">
+
+  <div class="dashboard-top-section">
+    <div class="profile-header-row">
+      <div class="profile-brand-logo">
+        <div class="logo-geometric-shape"></div>
+        <span class="logo-text">RAMBO</span>
+      </div>
+      <div class="profile-status-badge">
+        <span class="status-dot"></span>
+        Verified
+      </div>
+    </div>
+
+    <div class="profile-avatar-container">
+      <div class="profile-avatar">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div class="profile-verified-badge">
+        <i class="fa-solid fa-check"></i>
+      </div>
+    </div>
+    
+    <div class="honda-user-meta">
+      <h2>Hi, <span id="userPhoneNumber"></span></h2>
+      <p>Welcome back to your dashboard!</p>
+    </div>
+
+    <div class="honda-main-card">
+      <div class="balance-card-header">
+        <span class="honda-label">Available Balance</span>
+        <span class="currency-tag">NGN (₦)</span>
+      </div>
+      <div class="honda-amount-row">
+        <span id="balanceAmount">₦0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-scroll-container">
+    
+    <div class="honda-action-group">
+      <button id="mainRechargeTrigger" class="honda-btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Deposit
+      </button>
+      <button id="withdrawBtn" class="honda-btn-outline">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Withdraw
+      </button>
+    </div>
+
+    <div class="settings-group-wrapper">
+      <div class="settings-group-title">MY ACCOUNT</div>
+      <div class="settings-list-box">
+        
+        <div class="settings-item-row" id="myRecordsBtn">
+          <div class="item-left-side">
+             <i style="color: #f0a500;" class="fa-solid fa-wallet icon-cyan"></i>
+            <span>Transactions</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+        </div>
+
+        <div class="settings-item-row" id="earningsBtn">
+          <div class="item-left-side">
+            <i style="color: purple;" class="fa-solid fa-users-line icon-cyan"></i>
+            <span>My Team</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="settings-group-wrapper">
+      <div class="settings-group-title">TRANSACTIONS</div>
+      <div class="settings-list-box">
+
+        <div class="settings-item-row" id="depositBtnrec">
+          <div class="item-left-side">
+            <i style="color: green;" class="fa-solid fa-circle-down icon-cyan"></i>
+            <span>Deposit History</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+        </div>
+
+        <div class="settings-item-row" id="withdrawalBtn">
+          <div class="item-left-side">
+            <i style="color: red;" class="fa-solid fa-circle-up icon-cyan"></i>
+            <span>Withdraw History</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="settings-group-wrapper">
+      <div class="settings-group-title">SETTINGS</div>
+      <div class="settings-list-box">
+
+        <div class="settings-item-row" id="bankAccountBtn">
+          <div class="item-left-side">
+            <i style="color: blue;" class="fa-solid fa-credit-card icon-cyan"></i>
+            <span>Bank</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+        </div>
+
+        <a href="https://t.me/+bIHhahGNry0wY2M0" target="_blank" class="settings-item-link">
+          <div class="settings-item-row">
+            <div class="item-left-side">
+              <i style="color: #7ec8e3;" class="fa-brands fa-telegram icon-cyan"></i>
+              <span>Support</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+          </div>
+        </a>
+
+        <div class="settings-item-row logout-row" onclick="logout()">
+          <div class="item-left-side">
+            <i class="fa-solid fa-power-off icon-red"></i>
+            <span class="text-red">Logout</span>
+          </div>
+          <i class="fa-solid fa-chevron-right chevron-indicator indicator-red"></i>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<!-- END PROFILE PAGE -->
+
+
+<div class="bank-page" id="bankPage" style="display:none;">
+
+  <div class="bank-header">
+    <button class="bank-back-btn" onclick="backToProfile()">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <h2>Update Bank Details</h2>
+  </div>
+
+  <div class="honda-bank-container">
+    <form id="bankForm" class="honda-bank-form">
+      
+      <div class="honda-input-group">
+        <label class="honda-input-label">Bank Name</label>
+        <div class="honda-select-wrapper">
+          <select id="bankName" required>
+            <option value="" disabled selected>Select your bank</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="honda-input-group">
+        <label class="honda-input-label">Account Number</label>
+        <input type="text" id="accountNumber" maxlength="10" placeholder="Enter 10-digit account number" required>
+      </div>
+
+      <div class="honda-input-group">
+  <label class="honda-input-label">Account Name</label>
+  <input type="text" id="accountName" placeholder="Enter account name" required>
+</div>
+
+      <p class="honda-verification-notice">
+        Type your account details before saving
+      </p>
+
+      <button type="submit" class="honda-submit-btn" id="submitBtn">Update Bank Details</button>
+
+      <div class="honda-notice-card">
+        <div class="notice-header">
+          <div class="notice-circle">!</div>
+          <span>IMPORTANT SECURITY NOTICE</span>
+        </div>
+        <p class="notice-content">
+          For account security reasons, once a withdrawal account has been linked it cannot be changed on your own. Please make sure you link the correct bank account information for withdrawal requests; otherwise, the transaction will fail. If you confirm information is incorrect, please contact online customer support to have it reset.
+        </p>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+
+
+
+<div class="topup-wrapper" id="rechargePage" style="display:none;">
+    
+    <div class="topup-header">
+        <button id="rechargeBackBtn" aria-label="Go Back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </button>
+
+        <h2>Top up</h2>
+
+        <button class="recharge-history-btn" aria-label="View History">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+        </button>
+    </div> <div class="balance-card-module">
+        <span class="balance-label-text">CURRENT BALANCE</span>
+        <h1 class="balance-value-text">₦<span id="userBalance">0</span></h1>
+    </div>
+
+    <div class="amount-section-module">
+        <p style="font-weight:600; margin-bottom:10px;">Top up Amount</p>
+        <div class="amount-grid-layout">
+            <div class="amount-btn-item" data-value="3000">3,000</div>
+            <div class="amount-btn-item" data-value="6000">6,000</div>
+            <div class="amount-btn-item" data-value="12000">12,000</div>
+            <div class="amount-btn-item" data-value="24000">24,000</div>
+            <div class="amount-btn-item" data-value="48000">48,000</div>
+            <div class="amount-btn-item" data-value="96000">96,000</div>
+            <div class="amount-btn-item" data-value="192000">192,000</div>
+            <div class="amount-btn-item" data-value="384000">384,000</div>
+        </div>
+        <div class="custom-input-box">
+            <span style="color:#64748b; margin-right:10px;">₦</span>
+            <input type="number" id="customAmount" placeholder="3000" style="border:none; background:transparent; width:100%; outline:none;">
+        </div>
+    </div>
+
+    <div class="payment-section-module">
+        <p style="font-weight:600; margin-bottom:10px;">Payment Method</p>
+        <div class="channel-row-item active">
+            <div><strong>Payment Channel 1</strong><br><small style="color:#64748b;">Fast & Secure</small></div>
+            <div class="radio-select-dot"></div>
+        </div>
+        <div class="channel-row-item">
+            <div><strong>Payment Channel 2</strong><br><small style="color:#64748b;">Fast & Secure</small></div>
+            <div class="radio-select-dot"></div>
+        </div>
+        <button id="depositBtn" style="width:100%; padding:15px; background:#009ce0; color:white; border:none; border-radius:10px; cursor:pointer; margin-bottom: 20px;">Confirm</button>
+    </div>
+
+    <div class="rech-rules-box" id="rechargeRulesBox">
+        <div class="rech-rules-header" id="rechargeRulesToggle">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-shield-halved" style="color:#9d4edd;"></i>
+                <span class="rech-rules-title">Recharge Rules</span>
+            </div>
+            <i class="fa-solid fa-chevron-down rech-rules-chevron" id="rechargeRulesChevron"></i>
+        </div>
+        <div class="rech-rules-body" id="rechargeRulesBody" style="display:none;">
+            <ul class="info-list" style="margin-top:12px;">
+                <li>
+                    <span class="info-icon">1</span>
+                    <p>Ensure the transfer amount matches exactly what you entered above.</p>
+                </li>
+                <li>
+                    <span class="info-icon">2</span>
+                    <p>Funds are usually credited within <span class="highlight-blue">5 minutes</span> of confirmation.</p>
+                </li>
+                <li>
+                    <span class="info-icon">3</span>
+                    <p>Keep your transaction receipt handy for support verification.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div> ```
+
+
+
+<div class="withdraw-page" id="withdrawPage" style="display:none;">
+
+  <div class="withdraw-header-fixed">
+    <button class="withdraw-back-btn-v2" id="withdrawBackBtn">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h2>Withdraw Funds</h2>
+    <button class="history-btn">History</button>
+  </div>
+
+  <div class="recharge-container">
+    
+    <div class="balance-card-ev">
+      <svg class="satellite-icon" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M11 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"></path><path d="M5 2.91A12 12 0 0 0 5 21.09"></path><path d="M19 12h2"></path></svg>
+      <span class="balance-label-ev">AVAILABLE BALANCE FOR WITHDRAWAL</span>
+      <div id="withdrawBalance">₦0</div>
+    </div>
+
+    <div class="input-card-ev">
+      <div class="card-header-ev">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        WITHDRAWAL AMOUNT
+      </div>
+      <div class="min-text-ev">MINIMUM WITHDRAWAL AMOUNT: 600₦</div>
+      
+      <div class="withdraw-input-box-ev">
+        <span class="currency-neon">₦</span>
+        <input type="number" id="withdrawAmountInput" placeholder="Please enter withdrawal amount">
+      </div>
+      <p id="withdrawMaxBtn" class="max-btn-link">Withdraw Maximum</p>
+    </div>
+
+    <div class="card-header-ev" style="margin-bottom: 12px; padding-left: 5px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+      BANK ACCOUNT INFORMATION
+    </div>
+
+    <div id="withdrawBankCard">
+      <div id="bankDetailsDisplay" class="bank-info-grid">
+        <div class="bank-sub-card">
+          <div class="sub-card-label">ACCOUNT HOLDER</div>
+          <div class="sub-card-value" id="withdrawAccountName">---</div>
+        </div>
+        
+        <div class="bank-sub-card">
+          <div class="sub-card-label">ACCOUNT NUMBER</div>
+          <div class="sub-card-value" id="withdrawAccountNumber">---</div>
+        </div>
+
+        <div id="withdrawBankName" style= "display:none;"></div>
+      </div>
+
+      <div id="bankEmptyState" style="display:none; text-align:center; padding: 15px;">
+          <button id="addAccountBtn" class="add-bank-btn">ADD BANK ACCOUNT</button>
+      </div>
+    </div>
+
+    <button id="withdrawSubmitBtn">WITHDRAW NOW</button>
+
+    <div class="rules-card-ev">
+      <div class="rules-title-ev">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        WITHDRAWAL RULES
+      </div>
+
+      <div class="rule-item-ev"><div class="rule-num">1</div><span>1. Minimum withdrawal amount: ₦600.</span></div>
+      <div class="rule-item-ev"><div class="rule-num">2</div><span>2. Withdrawal fee: 15%.</span></div>
+      <div class="rule-item-ev"><div class="rule-num">3</div><span>3. Withdrawal time: 9:30 AM to 5:00 PM daily.</span></div>
+      <div class="rule-item-ev"><div class="rule-num">4</div><span>4. Withdrawals usually arrive within 30 minutes to 24 hours.</span></div>
+      <div class="rule-item-ev">
+        <div class="rule-num">6</div>
+        <span class="warning-text">Note: Withdrawal functionality is available after investing in VIP1 or higher-level products.</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+  <div id="welcomePopup" class="popup-overlay">
+  <div class="mx-unique-modal">
+    
+    <button class="mx-close-x-btn" id="closePopup" onclick="document.getElementById('welcomePopup').style.display='none'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <div class="mx-modal-brand-token">
+      <div class="mx-token-shape"></div>
+      <span class="mx-token-text">RAMBO</span>
+    </div>
+    
+    <h2 class="mx-modal-title">Welcome to Rambo</h2>
+
+    <div class="mx-benefit-list">
+      
+      <div class="mx-benefit-item">
+        <div class="mx-item-icon icon-sparkle">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/></svg>
+        </div>
+        <span class="mx-benefit-text">Join us today and start earning massively with our investment platform</span>
+      </div>
+
+      <div class="mx-benefit-item">
+        <div class="mx-item-icon icon-gift">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        </div>
+        <span class="mx-benefit-text">Welcome bonus: <strong>₦600</strong> for new members</span>
+      </div>
+
+      <div class="mx-benefit-item">
+        <div class="mx-item-icon icon-coin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></svg>
+        </div>
+        <span class="mx-benefit-text">Minimum investment: <strong>₦3,000</strong></span>
+      </div>
+
+      <div class="mx-benefit-item">
+        <div class="mx-item-icon icon-users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <span class="mx-benefit-text">Referral program: Earn <strong>20%</strong> for direct referrals and <strong>3%</strong> for secondary referrals.</span>
+      </div>
+
+    </div>
+
+    <p class="mx-popup-sub-notice">*Referring is optional - you can withdraw without referring</p>
+
+    <div class="mx-button-group">
+      <a href="https://t.me/+bIHhahGNry0wY2M0" class="mx-telegram-btn">
+        <svg class="mx-tg-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.15 2.7-2.46 2.75-2.68.01-.03.01-.14-.06-.2-.07-.06-.17-.04-.25-.02-.11.02-1.83 1.16-5.16 3.41-.49.33-.93.5-1.33.49-.44-.01-1.29-.25-1.92-.45-.77-.25-1.39-.39-1.34-.83.03-.23.35-.46.97-.71 3.82-1.66 6.37-2.75 7.64-3.27 3.64-1.48 4.4-1.74 4.89-1.75.11 0 .35.03.51.16.13.1.17.25.19.35-.02.07-.02.19-.03.28z"/></svg>
+        Official channel
+      </a>
+    </div>
+    <div class="mx-button-group">
+      <a href="https://chat.whatsapp.com/EVYYVWvy3Zh5YwG7Zsg5Dn" class="mx-telegram-btn">
+        <svg class="mx-tg-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.15 2.7-2.46 2.75-2.68.01-.03.01-.14-.06-.2-.07-.06-.17-.04-.25-.02-.11.02-1.83 1.16-5.16 3.41-.49.33-.93.5-1.33.49-.44-.01-1.29-.25-1.92-.45-.77-.25-1.39-.39-1.34-.83.03-.23.35-.46.97-.71 3.82-1.66 6.37-2.75 7.64-3.27 3.64-1.48 4.4-1.74 4.89-1.75.11 0 .35.03.51.16.13.1.17.25.19.35-.02.07-.02.19-.03.28z"/></svg>
+        Official Whatsapp group
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRODUCT PAGE -->
+<div class="product-page" id="productPage" style="display:none;">
+  
+  <!-- Header Image -->
+  <div class="product-header-img">
+    <img src="photo.jpg" alt="Platform News">
+  </div>
+
+  <h2 class="product-header"><i class="fas fa-chart-line"></i> Reviews & News</h2>
+
+  <!-- Reviews Ticker -->
+  <div class="reviews-ticker-wrapper">
+    <div class="reviews-ticker" id="reviewsTicker"></div>
+  </div>
+</div>
+
+
+
+
+<div class="invite-page" id="invitePage" style="display:none;">
+
+  <div class="invite-header-fixed-v2">
+    <button class="invite-back-btn-v2" id="inviteBackBtn">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <h2>Invite Friends</h2>
+  </div>
+
+  <div class="referral-container">
+    
+    <div class="section-block-wrapper">
+      <h3 class="section-block-title">Your Referral Tools</h3>
+      
+      <div class="referral-card">
+        <p class="card-label">Your Invite Code</p>
+        <div class="copy-input-wrapper">
+          <div class="code-display" id="inviteCode">Loading...</div>
+          <button class="copy-action-btn" onclick="copyText('inviteCode')">
+            <span>Copy Code</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="referral-card">
+        <p class="card-label">Your Invite Link</p>
+        <div class="copy-input-wrapper">
+          <input type="text" id="refLink" class="link-display" value="Generating link..." readonly>
+          <button class="copy-action-btn" onclick="copyInviteLink()">
+            <span>Copy Link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block-wrapper">
+      <h3 class="section-block-title">Your Earnings Structure</h3>
+      
+      <div class="earnings-tier-row">
+        <div style="background-color: #10b981;" class="tier-badge-indicator ">1</div>
+        <div class="tier-info-text">
+          <h4>Direct Referrals (Level 1)</h4>
+          <p>Friends who sign up using your link</p>
+        </div>
+        <div style="color: goldenrod;" class="tier-value-pill ">20% Bonus</div>
+      </div>
+
+      <div class="earnings-tier-row">
+        <div  class="tier-badge-indicator accent-silver">2</div>
+        <div class="tier-info-text">
+          <h4>Secondary Referrals (Level 2)</h4>
+          <p>Friends of your friends</p>
+        </div>
+        <div style="color: goldenrod;" class="tier-value-pill ">3% Commission</div>
+      </div>
+    </div>
+
+    <div class="how-it-works-card">
+      <div class="how-header">
+        <i class="fa-solid fa-circle-nodes"></i>
+        <h3>How It Works</h3>
+      </div>
+
+      <div class="step-item">
+        <div class="step-check-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="step-content">
+          <p>Share your invite code or link with friends</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-check-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="step-content">
+          <p>Earn <span style="color: goldenrod;" class="highlight-cyan">20% bonus</span> when your direct referrals invest</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-check-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="step-content">
+          <p>Earn <span style="color: goldenrod;" class="highlight-cyan">3% commission</span> when their referrals invest</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-check-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="step-content">
+          <p>Earnings are credited immediately after investment</p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+  
+      
+  <!-- Daily Check Loader -->
+<div id="dailyLoader" class="daily-loader">
+  <div class="spinner-3d"></div>
+  <p>Checking in...</p>
+</div>
+
+
+
+<div id="earningsPage" class="page" style="display: none; padding: 0;">
+  <div class="team-header-main">
+    <button id="earningsBackBtn" class="back-btn-white">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <span>Team Details</span>
+  </div>
+
+  
+  <div class="recharge-page-container">
+    <h3 style="color: #10b981; text-align: left; letter-spacing: 2px; margin-bottom: 20px;">| TIER SYSTEM</h3>
+
+    <div class="tier-card-main" onclick="showLevelDetails(1)">
+        <div class="tier-header">
+            <div class="tier-title"><i class="fa-solid fa-users"></i> Team 1</div>
+            <div class="tier-badge">Tier 1</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="t1Count">0</div>
+                <div class="stat-label">TOTAL MEMBERS</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="t1Invest">₦0</div>
+                <div class="stat-label">INVESTMENT</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="t1Comm">₦0</div>
+                <div class="stat-label">COMMISSION</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tier-card-main" onclick="showLevelDetails(2)">
+        <div class="tier-header">
+            <div class="tier-title"><i class="fa-solid fa-user-group"></i> Team 2</div>
+            <div class="tier-badge">Tier 2</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="t2Count">0</div>
+                <div class="stat-label">TOTAL MEMBERS</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="t2Invest">₦0</div>
+                <div class="stat-label">INVESTMENT</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="t2Comm">₦0</div>
+                <div class="stat-label">COMMISSION</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailView" style="display: none; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 id="listTitle" style="color: #10b981;">Team Members</h4>
+            <button onclick="closeDetails()" style="background: transparent; border: 1px solid #10b981; color: #10b981; border-radius: 5px; padding: 5px 10px;">Back</button>
+        </div>
+        <div id="teamList"></div>
+    </div>
+
+    <div class="benefits-container" id="benefitsBox">
+        <div class="benefits-title"><i class="fa-solid fa-triangle-exclamation"></i> Team Benefits Description</div>
+        <div class="benefit-item"><i class="fa-solid fa-chevron-right"></i> Earn commission from Tier 1 when friends invest</div>
+        <div class="benefit-item"><i class="fa-solid fa-chevron-right"></i> Earn commission from Tier 2 when friends of friends invest</div>
+        <div class="benefit-item"><i class="fa-solid fa-chevron-right"></i> Commission is automatically credited to balance</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<div id="myInvestmentPage" class="investment-page" style="display:none;">
+
+  <div class="investment-header">
+    <button id="investmentBackBtn" class="investment-back-btn">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <div id="investmentLogo"></div>
+    <h2>My Investments</h2>
+  </div>
+
+  <div class="investment-sub-header">
+    <h1>Investment Plans</h1>
+    <p>Track your investment plans and their statuses below.</p>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="premium-card">
+      </div>
+  </div>
+
+</div>
+
+<!-- Records Page -->
+<div class="records-page" id="recordsPage" style="display:none;">
+
+  <div class="records-header">
+  <button id="recordsBackBtn" class="records-back-btn">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
+  <h2>Transactions</h2>
+</div>
+
+<div class="records-filter">
+  <button class="filter-btn active" data-type="all">All</button>
+  <button class="filter-btn" data-type="withdrawal">Withdrawal</button>
+  <button class="filter-btn" data-type="deposit">Deposit</button>
+</div>
+
+  <div id="recordsContainer">
+   
+  </div>
+</div>
+
+
+
+
+<div id="investmentModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="sheet-header">
+      <h2 class="sheet-title">Confirm Purchase</h2>
+     <button class="close-sheet">×</button>
+    </div>
+
+    <div class="slim-card">
+      <div class="product-main-row">
+        <div class="check-icon-container">
+          <div class="check-icon">L</div> </div>
+        <div class="product-details">
+          <strong id="modalPlanName">NOVA 3</strong>
+          <p>Cost: ₦<span id="modalPlanCost">15,000.00</span></p>
+        </div>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="account-balance-row">
+        Account: ₦<span id="modalUserBalance">0.00</span>
+      </div>
+    </div> 
+
+    <div class="action-area">
+      <button id="finalInvestBtn" class="purchase-btn">Purchase</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+  <div class="nav-pill-container">
+    
+    <a href="#" class="nav-item active" id="homeNav">
+      <div class="nav-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </div>
+      <span class="nav-label-text">Home</span>
+    </a>
+
+    <a href="#" class="nav-item" id="investmentRecordsBtn">
+      <div class="nav-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+      </div>
+      <span class="nav-label-text">Products</span>
+    </a>
+
+    <a href="#" class="nav-item" id="shareBtn">
+      <div class="nav-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+      </div>
+      <span class="nav-label-text">Share</span>
+    </a>
+
+    <a href="#" class="nav-item" onclick="openProfile()">
+      <div class="nav-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+      <span class="nav-label-text">Profile</span>
+    </a>
+
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>
