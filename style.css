@@ -1668,7 +1668,7 @@ body {
 
 /* Input Styling */
 .custom-input-box {
-    background: #f8fafc; border: 1px solid var(--border-gray);
+    /* background: #f8fafc; border: 1px solid var(--border-gray); */
     border-radius: 10px; display: flex; align-items: center;
     padding: 0 16px; height: 50px;
 }
@@ -1684,7 +1684,7 @@ body {
     padding: 14px; display: flex; align-items: center;
     justify-content: space-between; margin-bottom: 10px;
 }
-.channel-row-item.active { border: 2px solid var(--brand-pink); }
+.channel-row-item.active { border: 2px solid green; }
 .radio-select-dot { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 50%; }
 .channel-row-item.active .radio-select-dot { background: var(--brand-pink); border-color: var(--brand-pink); }
 
