@@ -64,7 +64,7 @@ exports.handler = async (event) => {
       mch_id: MERCHANT_ID,
       mch_order_no: depositId,
       mch_return_msg: "deposit",
-      notify_url: "https://ramboinvestment.website/functions/notify",
+      notify_url: "https://www.ramboinvestment.website/.netlify/functions/createpayment",
       order_date: new Date().toISOString().slice(0, 19).replace("T", " "),
       page_url: "https://ramboinvestment.website",
       pay_type: "523",
