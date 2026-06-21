@@ -1,141 +1,101 @@
+const md5 = require("md5");
 const admin = require("firebase-admin");
 
-// --- INITIALIZE MAIN DB ---
-const mainApp = !admin.apps.find(app => app.name === '[DEFAULT]')
+const formatKey = (key) => key ? key.replace(/\\n/g, '\n').replace(/\n\s+/g, '\n').trim() : undefined;
+
+// --- INIT MAIN DB (Project: mimiads-market) ---
+const mainApp = !admin.apps.find(app => app.name === "[DEFAULT]")
   ? admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "new-site-23306",
-        clientEmail: "firebase-adminsdk-fbsvc@new-site-23306.iam.gserviceaccount.com",
-        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCmoBHfSQ9mQV2m\n1H7jC+/co/4bSExhUIW1PO+ruGq6Znyg85o60BXrNxXwzm5WhAsj0mQRwFB/1LWU\ns3q6qIPaFm0k8SgM5hTr+AtvLEQo3gRr4yWim4E+66pkYSnx4HIKpKZXRDjsVcIv\naaChYF+4gFc9BK91B7ej2FJhoJ/QBs6gcQoQ+QWaw3HWCzm/lTXsesqKKX6xS8EB\n5c899ke6afu5Gosle4vqTMTy2QMRPaUO4gHlA/3XG35l32hRMgYN+r/n0EDMWx2J\ny5LPxgUm+E3Po6NiMPec0sYAjMKjBgC41OJ1mIhcTgGcQdj+9dJHSZzrC5SufL2t\n8SN2PE5pAgMBAAECggEADCsQYxAA0eTgI/jMs2QBxkkrm25yNYEd4phqoE29bZNi\ncpaXosfjceP59DX/FM5byefpaupydoNgJ1XcFpmL13dfzRzXYenDiV/55cqDx8A+\n7moOK4vTqnanYOE/oOxVJ7XSd/kBdzDkF3ZNRru1AdJNjKU08wT3Qj3f9kU2poha\nh8QTOR0NWS4kuDPO1Fh4dX/H45tbpvBdwk2Cssp2QAI7hjfnLs5k6GW74Jwe1X9b\npEA1MeaN6QxHa0JOjtzRdhD14vbDBarPN0A1hrj7oGSFZXH19Q2DFmnV9H7EclII\npAFCX/WakuEZUplhUb/uwHwcTBSr+tSUoXt/LrbHaQKBgQDYZ193CMU+H80yyt7N\nKANFwbCWEm5xLhFu/1xYZAGnyNPXly3AqF14W9wbcWkkxcT+aurGoqrDdHx1q6rs\nUhwimd4NPcT7S9gpCrDlEdXFtZI3muaEjxyHHSmK/Y8MREFm4ccuoTJqVAG0FPV3\n3h7dxAc7c/cstdzU9x7njPbCPwKBgQDFHQICcLSp8RfzLWDlQX1a7vnX2148I7Hi\nm/vFW406SezRoLmv64rIM3lQDZRFVfHnYi6RsTEfBRyaIthHTORyb892Oa6Fjy03\nyGpWE5nluKOA+PjYswO+RrLyJDkJAau7AFpHZSRnZNolUhekranj6KED2Tv8Kc4L\nsVvF5wb1VwKBgQC//EXHdvJ2QQRtEWpEnED6+/FL0qJEqtgwn0Av8tk9H4BBfg/L\nIhN6mhRWDHF5fDNee0A6ZUoWCRv50Qjci6QGVneXS7ucLhdhoeh58S60Lne/+R6V\nb9mhTQ/0DSuBeHSFb7yj88Kkbk7sksOLSnYbzLOV3TXmZpm6Hls+leK9RQKBgEgo\nKU8pYQmBB4puxzTFd5UtPGrHlEShsIHLJiyGKjn3S+klVDRRHnnRVgx3HBsRrj9M\n0s1ktx2q6mCGdvQK8untgl2+GeQsmJn+FOczv7e3kqso+TeiuLEUAnffyL1CTlJj\ne6j9Hol3AuB8n8kaBcI3q5HUGUBjMVlYcMcOnp57AoGAIGEH6rOFddOK+47/jf/P\nNAAqMbtN/3RQWHBrVIp2pmzSBJSS/vBQ7PozhwzT7ZtnIVnESlKlcdmX3VfDzqZT\nv4VeuOyUPVDjgc+rhC4Xicsno0Gygm6zF0XmWA1y0JkPAIiKj2wWVM3HcP6u7oc+\nfK5EA+kGOTKBRjIb0TC4Z5s=\n-----END PRIVATE KEY-----"
+        projectId: "mimiads-market",
+        clientEmail: "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
+        privateKey: formatKey(process.env.FIREBASE_PRIVATE_KEY),
       }),
     })
   : admin.app();
 
-const coreNextApp = !admin.apps.find(app => app.name === 'coreNext')
-  ? admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: "core-next-61bc9",
-        clientEmail: "firebase-adminsdk-fbsvc@core-next-61bc9.iam.gserviceaccount.com",
-        privateKey: process.env.CORE_NEXT_PRIVATE_KEY?.replace(/\\n/g, '\n')
-      }),
-    }, 'coreNext')
-  : admin.app('coreNext');
+// --- INIT CORE NEXT DB (Hardcoded Credentials) ---
+const coreNextApp = !admin.apps.find(app => app.name === "coreNext")
+  ? admin.initializeApp({ 
+      credential: admin.credential.cert({ 
+        projectId: "ads-manager-b7cf2", 
+        clientEmail: "firebase-adminsdk-fbsvc@ads-manager-b7cf2.iam.gserviceaccount.com", 
+        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDDmwOs2JsO3bMo\n5cumSOFAkHwqrrN174k/U1rIIXmHdag9LbtoVZlKbwhklrb6SzV5uogKkW07iM1j\nTbReovdbFrczinuI3f4+vPWhGZSGm+NCh6wu6I5aKUQgsGNO+FIYQuw5hQ3z8mKz\n3RT5EMFhQdDsiI3tkIwJLVKIOKR9E3aFZJFDSxLf2Dk/P5ewIG6P6O6frl7wDPna\nbHpac9ib79ANjnPMv+13ZQc/M5Wkp6xmYAYOd8IMFeXcnWe0XmZMorCn3bvM3Hqu\nG2dYfned/Tu15uHsZDaLfdx2OLHej/XflVWXulO1Dw7y2/QFPKhT5O1Lra0Bz3u+\n9OtpW+y1AgMBAAECggEAA1mr2fGJ0lrcvzYUY2A7L3JqFgcQ/tOf+6wvUV81aCsN\nOyMF4zcYHYzCTYrBTo8sNs4Jl3i/MLZaojlJ/hb3eqFseN8F16XJvYRaBqzb/OQ9\no72UJueHzKaJSrAKu2cIbO70gdW0E/oSU7dVLSDq1wIcFHkQSUHhDCUxFTE3LAc6\nGHl9BcRNml2Hr3Q8/NXcQiG7Dz9CvtRs2HzAn7jsLD+J7bQRE9GZvfmVW/baDKiL\nFAxLdcC/Cdbe4wv2zc35pqj18obYibFxkQC3yY9YhywQfkJcQZxCFa4HFHuD3l8g\nUvXUciJA9Tse9Pk1EvdmS52P0iGjMlKSmp30lnQATwKBgQD7J6hKf/j5VhbVQ3x2\nMKkkFeafOZpztFCPf0YVsocgU91SP1+78ym/cDgbxDG+pt2qdf9PgvFuTzRfM7Oa\nUh8LFSHIYNDYbFIaMTC2Fd8xvMYNbGGWwanksDR5V4w8JXsGcMO5Nd1W4e9UEOyZ\nX3hMGIt0r0FM8bRvwGgaEaTnHwKBgQDHYQXw9A1BLrpsT7Tj539AcZK+eF0g6+AR\nNCECI4YdncaBoJI0DletRQUpKRWtmIIdK+5WhReJUB2u0VB24wn/9gYvb5QdS8qE\na4TpEnh7eGZaHYm8v6Y0rcM6LikED0pfDLeE5m+cW5ntuAxOondUXDkZzptIAu4/\n1dPP/sAVqwKBgBXYCScRolHtTucVi4msCcn9raVDmU9e63LPmwTgFiiVorY4lNb/\n+y2PURH5KmpukPD2elIsDVuOv/tXv9M4OUL5f4qyAPgR08I7bQUpOdRVmtQoDQTT\nqzccrDOxjZzdlamlvSAqsymPVQV2w11DlG7p45cudvt+OjdOAL/jsPf5AoGACHtU\nKV/4gGFghOMPKvLaMv+h4oB0VcYzDghNry2bsv7XRwRxs804ZaKeCZY52dy3DE6m\nIQAgdDL4UEuPRL972Wu576KrhmOHBgMc8F1cysPgdszy4xi0FWGfAIaeMBIGc+yy\nkfDLprcu4TIHNAEtWmVh+HsVmAan5AdQr3SC72kCgYEApkcHjPUOTxBS9muJnT4m\n3dalNF1eP41qA2m/Wy4f9RbEBPY6vTQTHYvKWc4PPUa/K7F8TzAfkRIrMK/lfgwk\nA8PIiotY5RitsvvGlt1uCUckA1qre2lnxKpApqTxtV6j4L2UTggjColPcAXJqxWv\n6Rr8EJ5jWE7neEMDk24x+L8=\n-----END PRIVATE KEY-----\n"
+      }) }, "coreNext")
+  : admin.app("coreNext");
 
-const db = mainApp.firestore();
-const coreNextDb = coreNextApp.firestore();
+const mainDb = mainApp.firestore();
+const FieldValue = admin.firestore.FieldValue;
+
+const headers = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 exports.handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  };
-
   if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "ok" };
+  if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: "Method Not Allowed" };
 
   try {
-    console.log("KORAPAY WEBHOOK RAW BODY:", event.body);
-    const rawData = JSON.parse(event.body);
+    const secretDoc = await mainDb.collection("_secrets_").doc("keys").get();
+    const secrets = secretDoc.data();
+    const withdrawalPrivateKey = formatKey(secrets.withdrawal_key);
+    
+    const coreNextDb = coreNextApp.firestore();
+    
+    let data;
+    try { data = JSON.parse(event.body); } 
+    catch { const params = new URLSearchParams(event.body); data = Object.fromEntries(params.entries()); }
 
-    // ✅ Korapay webhook format
-    const event_type = rawData.event; // e.g. "transfer.success" or "transfer.failed"
-    const payload = rawData.data;
-    const reference = payload?.reference;
+    const WITHDRAWAL_KEY = process.env.WITHDRAWAL_KEY;
 
-    console.log("EVENT TYPE:", event_type);
-    console.log("REFERENCE:", reference);
+    // --- Signature Verification ---
+    const signString = 
+      `applyDate=${data.applyDate}&` +
+      `merNo=${data.merNo}&` +
+      `merTransferId=${data.merTransferId}&` +
+      `respCode=${data.respCode}&` +
+      `tradeNo=${data.tradeNo}&` +
+      `tradeResult=${data.tradeResult}&` +
+      `transferAmount=${data.transferAmount}&` +
+      `version=${data.version}&` +
+      `key=${WITHDRAWAL_KEY}`;
 
-    if (!reference) {
-      console.log("No reference found, acknowledging.");
-      return { statusCode: 200, headers, body: "success" };
+    const expectedSign = md5(signString);
+
+    if (data.sign !== expectedSign) {
+      console.error("Signature Mismatch!");
+      return { statusCode: 400, headers, body: "Invalid Signature" };
     }
 
-    // --- Find withdrawal document by reference (tradeNo) ---
-    let withdrawRef;
-    let withdrawDoc;
+    const withdrawId = data.merTransferId;
+    const withdrawRef = coreNextDb.collection("withdrawals").doc(withdrawId);
+    const withdrawDoc = await withdrawRef.get();
 
-    // Check direct doc ID first
-    const directDoc = await coreNextDb.collection("withdrawals").doc(reference).get();
-    if (directDoc.exists) {
-      withdrawRef = directDoc.ref;
-      withdrawDoc = directDoc;
-    } else {
-      // Query by tradeNo
-      const querySnap = await coreNextDb.collection("withdrawals")
-        .where("tradeNo", "==", reference).limit(1).get();
+    if (!withdrawDoc.exists) return { statusCode: 200, headers, body: "success" };
 
-      if (!querySnap.empty) {
-        withdrawDoc = querySnap.docs[0];
-        withdrawRef = withdrawDoc.ref;
-      } else {
-        console.log("No matching withdrawal found for reference:", reference);
-        return { statusCode: 200, headers, body: "success" };
-      }
+    const withdrawData = withdrawDoc.data();
+    if (["success", "failed"].includes(withdrawData.status)) return { statusCode: 200, headers, body: "success" };
+
+    const uid = withdrawData.uid;
+    const originalAmount = Number(withdrawData.originalAmount || 0);
+
+    // --- Process Result ---
+    if (data.tradeResult === "1") {
+      await withdrawRef.set({ status: "success", tradeNo: data.tradeNo, notifiedAt: FieldValue.serverTimestamp() }, { merge: true });
+      await mainDb.collection("users").doc(uid).set({ hasPendingWithdrawal: false }, { merge: true });
+    } 
+    else if ((data.tradeResult === "2" || data.tradeResult === "3") && !withdrawData.refunded) {
+      await withdrawRef.set({ status: "failed", failReason: "Transfer failed", refunded: true, notifiedAt: FieldValue.serverTimestamp() }, { merge: true });
+      await mainDb.collection("users").doc(uid).set({ 
+        balance: FieldValue.increment(originalAmount), 
+        hasPendingWithdrawal: false 
+      }, { merge: true });
     }
 
-    const currentData = withdrawDoc.data();
-
-    // ✅ Skip if already finalized
-    if (["success", "failed"].includes(currentData.status)) {
-      console.log("Already finalized:", currentData.status);
-      return { statusCode: 200, headers, body: "success" };
-    }
-
-    // ✅ Map Korapay event to status
-    let newStatus = "processing";
-    if (event_type === "transfer.success") newStatus = "success";
-    if (event_type === "transfer.failed") newStatus = "failed";
-
-    console.log("NEW STATUS:", newStatus);
-
-    if (newStatus === "processing") {
-      await withdrawRef.update({
-        status: "processing",
-        last_updated: admin.firestore.FieldValue.serverTimestamp()
-      });
-      return { statusCode: 200, headers, body: "success" };
-    }
-
-    // --- Atomic transaction ---
-    const { uid, originalAmount, amount } = currentData;
-    const payoutAmount = Number(originalAmount || amount || 0);
-    const userRef = db.collection("users").doc(uid);
-    const statsRef = db.collection("adminSettings").doc("stats");
-
-    await db.runTransaction(async (transaction) => {
-      const freshSnap = await transaction.get(withdrawRef);
-      const freshData = freshSnap.data();
-
-      if (["success", "failed"].includes(freshData.status)) return;
-
-      transaction.update(withdrawRef, {
-        status: newStatus,
-        korapayReference: reference,
-        notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-        rawWebhookData: rawData
-      });
-
-      if (newStatus === "success") {
-        // ✅ Update user and stats
-        transaction.update(userRef, { hasPendingWithdrawal: false });
-        transaction.set(statsRef, {
-          allTimeWithdrawals: admin.firestore.FieldValue.increment(payoutAmount)
-        }, { merge: true });
-
-      } else if (newStatus === "failed") {
-        // ✅ Refund user balance
-        transaction.update(userRef, {
-          balance: admin.firestore.FieldValue.increment(payoutAmount),
-          hasPendingWithdrawal: false
-        });
-        transaction.update(withdrawRef, { refunded: true });
-      }
-    });
-
-    console.log("Webhook processed successfully:", newStatus);
     return { statusCode: 200, headers, body: "success" };
-
   } catch (err) {
-    console.error("Webhook Error:", err);
+    console.error("Callback Error:", err);
     return { statusCode: 500, headers, body: "error" };
   }
 };

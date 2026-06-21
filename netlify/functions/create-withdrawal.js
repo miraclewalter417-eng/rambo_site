@@ -6,8 +6,8 @@ const url = require("url"); // Imported for safe proxy string parsing
 const mainApp = !admin.apps.find(app => app.name === '[DEFAULT]') 
   ? admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "zz",
-        clientEmail: "firebase-adminsdk-fbsvc@new-site-23306.iam.gserviceaccount.com",
+        projectId: "mimiads-market",
+        clientEmail: "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
         privateKey: process.env.MAIN_DB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
     })
@@ -16,8 +16,8 @@ const mainApp = !admin.apps.find(app => app.name === '[DEFAULT]')
 const coreNextApp = !admin.apps.find(app => app.name === 'coreNext')
   ? admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "core-next-61bc9",
-        clientEmail: "firebase-adminsdk-fbsvc@core-next-61bc9.iam.gserviceaccount.com",
+        projectId: "ads-manager-b7cf2",
+        clientEmail: "firebase-adminsdk-fbsvc@ads-manager-b7cf2.iam.gserviceaccount.com",
         privateKey: process.env.CORE_NEXT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
     }, 'coreNext')

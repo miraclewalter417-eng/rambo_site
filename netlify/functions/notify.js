@@ -5,9 +5,8 @@ const admin = require("firebase-admin");
 const mainApp = !admin.apps.find((app) => app.name === "[DEFAULT]")
   ? admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "new-site-23306",
-        clientEmail:
-          "firebase-adminsdk-fbsvc@new-site-23306.iam.gserviceaccount.com",
+        projectId: "mimiads-market",
+        clientEmail: "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
       }),
     })
@@ -18,9 +17,8 @@ const heavyLoadApp = !admin.apps.find((app) => app.name === "heavyLoad")
   ? admin.initializeApp(
       {
         credential: admin.credential.cert({
-          projectId: "heavyload-d40b7",
-          clientEmail:
-            "firebase-adminsdk-fbsvc@heavyload-d40b7.iam.gserviceaccount.com",
+          projectId: "oga-viral",
+          clientEmail: "firebase-adminsdk-fbsvc@oga-viral.iam.gserviceaccount.com",
           privateKey: process.env.HEAVY_LOAD_PRIVATE_KEY?.replace(/\\n/g, "\n"),
         }),
       },

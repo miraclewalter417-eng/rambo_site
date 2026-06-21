@@ -1201,12 +1201,16 @@ async function fetchBankDetails() {
 
     if (docSnap.exists()) {
       const data = docSnap.data().bankAccount;
-      if (document.getElementById("accNameDisplay"))
-        document.getElementById("accNameDisplay").innerText = data.accountName;
-      if (document.getElementById("accNumDisplay"))
-        document.getElementById("accNumDisplay").innerText = data.accountNumber;
-      if (document.getElementById("bankNameDisplay"))
-        document.getElementById("bankNameDisplay").innerText = data.bankName;
+      if (data) {
+        if (document.getElementById("accNameDisplay"))
+          document.getElementById("accNameDisplay").innerText = data.accountName || "";
+        if (document.getElementById("accNumDisplay"))
+          document.getElementById("accNumDisplay").innerText = data.accountNumber || "";
+        if (document.getElementById("bankNameDisplay"))
+          document.getElementById("bankNameDisplay").innerText = data.bankName || "";
+      } else {
+        console.warn("No bankAccount object found in settings document.");
+      }
     }
   } catch (error) {
     console.error("Error fetching bank details:", error);

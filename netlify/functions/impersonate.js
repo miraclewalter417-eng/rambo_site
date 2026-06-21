@@ -2,8 +2,8 @@ const admin = require('firebase-admin');
 
 // 1. Initialize Firebase using hardcoded IDs to save Netlify space
 const serviceAccount = {
-  projectId: "new-site-23306",
-  clientEmail: "firebase-adminsdk-fbsvc@new-site-23306.iam.gserviceaccount.com",
+  projectId: "mimiads-market",
+  clientEmail: "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
   privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
 };
 

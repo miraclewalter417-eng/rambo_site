@@ -4,8 +4,8 @@ const admin = require("firebase-admin");
 const app = !admin.apps.find(app => app.name === "heavyLoad")
   ? admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "heavyload-d40b7",
-        clientEmail: "firebase-adminsdk-fbsvc@heavyload-d40b7.iam.gserviceaccount.com",
+        projectId: "oga-viral",
+        clientEmail: "firebase-adminsdk-fbsvc@oga-viral.iam.gserviceaccount.com",
         privateKey: process.env.HEAVY_LOAD_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
     }, "heavyLoad")

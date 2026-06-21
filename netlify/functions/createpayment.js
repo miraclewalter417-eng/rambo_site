@@ -1,159 +1,134 @@
 const md5 = require("md5");
 const admin = require("firebase-admin");
 
-// --- INIT MAIN DB (Hardcoded IDs to save space) ---
-const mainApp = !admin.apps.find((app) => app.name === "[DEFAULT]")
+const formatKey = (key) => key ? key.replace(/\\n/g, '\n').replace(/\n\s+/g, '\n').trim() : undefined;
+
+// 1. MAIN App initialization (Project: mimiads-market)
+const mainApp = !admin.apps.find(app => app.name === "[DEFAULT]")
   ? admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: "mimiads-market",
-        clientEmail:
-          "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      }),
-    })
+    credential: admin.credential.cert({
+      projectId: "mimiads-market",
+      clientEmail: "firebase-adminsdk-fbsvc@mimiads-market.iam.gserviceaccount.com",
+      privateKey: formatKey(process.env.FIREBASE_PRIVATE_KEY),
+    }),
+  })
   : admin.app();
 
-// --- INIT HEAVY DB (Hardcoded IDs to save space) ---
-const heavyLoadApp = !admin.apps.find((app) => app.name === "heavyLoad")
-  ? admin.initializeApp(
-      {
-        credential: admin.credential.cert({
-          projectId: "oga-viral",
-          clientEmail:
-            "firebase-adminsdk-fbsvc@oga-viral.iam.gserviceaccount.com",
-          privateKey: process.env.HEAVY_LOAD_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-        }),
-      },
-      "heavyLoad",
-    )
+// 2. HEAVY LOAD App initialization (Project: oga-viral)
+const heavyLoadApp = !admin.apps.find(app => app.name === "heavyLoad")
+  ? admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: "oga-viral",
+      clientEmail: "firebase-adminsdk-fbsvc@oga-viral.iam.gserviceaccount.com",
+      privateKey: formatKey(process.env.HEAVY_LOAD_PRIVATE_KEY),
+    }),
+  }, "heavyLoad")
   : admin.app("heavyLoad");
 
-const db = mainApp.firestore();
+const mainDb = mainApp.firestore();
 const transactionDb = heavyLoadApp.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
 exports.handler = async (event) => {
+  console.log("DEBUG: VERSION 5 - Using Project IDs: mimiads-market & oga-viral");
+
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    };
+    return { statusCode: 200, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type" } };
   }
 
   try {
     const { amount, depositId, userId } = JSON.parse(event.body);
 
-    // Change these lines in your DEPOSIT function:
     const MERCHANT_ID = process.env.MERCHANT_ID;
-    const PAYMENT_KEY = process.env.DEPOSIT_KEY; // Use the Deposit Key here!
+    const PAYMENT_KEY = process.env.DEPOSIT_KEY;
 
-    // !!! STILL UNCONFIRMED: field names below (mch_id, pay_type,
-    // trade_amount, bank_code etc.) are inherited from Nekpayment and
-    // have NOT been verified against Payrant's actual API spec. Same
-    // for the MD5 sorted-params signing method - Payrant may sign
-    // differently. This will likely fail or silently misbehave until
-    // confirmed against their real docs.
+    console.log("DEBUG: Raw Input", { amount, depositId, userId });
+
+    // ---- STEP 1: CREATE PENDING DEPOSIT in oga-viral ----
+    await transactionDb.collection("deposits").doc(depositId).set({
+      uid: userId || "unknown_user",
+      orderNo: depositId,
+      amount: parseFloat(amount),
+      status: "pending",
+      createdAt: FieldValue.serverTimestamp(),
+      gateway: "NekPayment",
+      expiresAt: Date.now() + (15 * 60 * 1000),
+    }, { merge: true });
+
+    console.log("DEBUG: Pending deposit created in transactionDb (oga-viral)");
+
+    // ---- STEP 2: BUILD GATEWAY PAYLOAD ----
     const data = {
       bank_code: "NGR044",
       goods_name: "Wallet Deposit",
       mch_id: MERCHANT_ID,
       mch_order_no: depositId,
       mch_return_msg: "deposit",
-      notify_url:
-        "https://ramboinvestment.netlify.app/.netlify/functions/notify",
+      notify_url: "https://ramboinvestment.website/functions/notify",
       order_date: new Date().toISOString().slice(0, 19).replace("T", " "),
-      page_url: "https://ramboinvestment.netlify.app/",
+      page_url: "https://ramboinvestment.website",
       pay_type: "523",
       trade_amount: parseFloat(amount).toFixed(2),
       version: "1.0",
-    };
+    };  
 
-    const keys = Object.keys(data).sort();
-    const signString =
-      keys.map((k) => `${k}=${data[k]}`).join("&") + `&key=${PAYMENT_KEY}`;
-
+    // ---- STEP 3: SIGN ----
+    const sortedKeys = Object.keys(data).sort();
+    const signString = sortedKeys.map(k => `${k}=${data[k]}`).join("&") + `&key=${PAYMENT_KEY}`;
     data.sign = md5(signString);
     data.sign_type = "MD5";
 
-    // --- STEP 1: SAFE WRITE (no crash if doc doesn't exist) ---
-    await transactionDb
-      .collection("deposits")
-      .doc(depositId)
-      .set(
-        {
-          userId: userId || "unknown_user",
-          orderNo: depositId,
-          amount: parseFloat(amount),
-          status: "pending",
-          timestamp: FieldValue.serverTimestamp(),
-          gateway: "payrant",
-
-          // CLEAN EXPIRY
-          expiresAt: Date.now() + 15 * 60 * 1000,
-        },
-        { merge: true },
-      );
-
-    // --- STEP 2: SEND TO GATEWAY ---
-    // !!! Endpoint path "/pay/web" is unconfirmed for Payrant - it was
-    // copied from Nekpayment. Fixed the double-slash typo, but the
-    // path itself still needs verification against Payrant's docs.
+    // ---- STEP 4: SEND TO GATEWAY ----
     const params = new URLSearchParams(data);
-
-    const response = await fetch("https://api.payrant.com/pay/web", {
+    const response = await fetch("https://payrant.com/api-core/transaction/checkout.php?ref=TXN_1756911546_77_015d87df", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,
     });
 
-    const result = await response.json();
+    const responseText = await response.text();
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error("Invalid JSON response from gateway: " + responseText);
+    }
 
-    // --- SUCCESS ---
+    // ---- STEP 5: HANDLE SUCCESS ----
     if (result?.respCode === "SUCCESS" && result?.payInfo) {
+      await transactionDb.collection("deposits").doc(depositId).set({
+        status: "awaiting_payment",
+        gatewayOrderNo: result.orderNo ?? null,
+        payInfo: result.payInfo,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+
       return {
         statusCode: 200,
         headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({
-          respCode: "SUCCESS",
-          payInfo: result.payInfo,
-        }),
+        body: JSON.stringify({ respCode: "SUCCESS", payInfo: result.payInfo }),
       };
     }
 
-    // --- FAIL ---
-    await transactionDb
-      .collection("deposits")
-      .doc(depositId)
-      .set(
-        {
-          status: "failed",
-          failReason: result?.tradeMsg || "Gateway Error",
-        },
-        { merge: true },
-      );
+    // ---- STEP 6: HANDLE FAILURE ----
+    await transactionDb.collection("deposits").doc(depositId).set({
+      status: "failed",
+      failReason: result?.tradeMsg ?? "Unknown error",
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
 
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({
-        respCode: "FAIL",
-        tradeMsg: result?.tradeMsg || "Payment Gateway Error",
-      }),
+      body: JSON.stringify({ respCode: "FAIL", tradeMsg: result?.tradeMsg }),
     };
-  } catch (err) {
-    console.error("Function Crash:", err);
 
+  } catch (err) {
+    console.error("DEBUG: Function Error:", err);
     return {
       statusCode: 500,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({
-        respCode: "ERROR",
-        tradeMsg: err.message,
-      }),
+      body: JSON.stringify({ respCode: "ERROR", tradeMsg: err.message }),
     };
   }
 };
