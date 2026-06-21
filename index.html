@@ -430,233 +430,90 @@
 
 
 
-<div class="payment-method-page" id="paymentMethodPage" style="display:none;">
-  <div class="recharge-header-fixed">
-    <button class="recharge-back-btn-v2" id="methodBackBtn">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-    <h2>Payment Method</h2>
-  </div>
 
-  <div class="recharge-page-container">
-    <p class="section-label" style="margin-top: 20px;">Choose a deposit method</p>
+
+<div class="topup-wrapper" id="rechargePage" style="display:none;">
     
-    <div class="method-card active-method" id="chooseAutomatic">
-      <div class="method-icon">
-        <i class="fa-solid fa-bolt-lightning"></i>
-      </div>
-      <div class="method-info">
-        <h3>Automatic Deposit</h3>
-        <p>Instant confirmation via gateway</p>
-      </div>
-      <div class="method-check">
-        <i class="fa-solid fa-circle-check"></i>
-      </div>
+    <div class="topup-header">
+        <button id="rechargeBackBtn" aria-label="Go Back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </button>
+
+        <h2>Top up</h2>
+
+        <button class="recharge-history-btn" aria-label="View History">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+        </button>
+    </div> <div class="balance-card-module">
+        <span class="balance-label-text">CURRENT BALANCE</span>
+        <h1 class="balance-value-text">₦<span id="userBalance">0</span></h1>
     </div>
 
-    <div class="method-card" id="chooseManual">
-      <div class="method-icon manual">
-        <i class="fa-solid fa-building-columns"></i>
-      </div>
-      <div class="method-info">
-        <h3>Manual Transfer</h3>
-        <p>Bank transfer (Admin approval)</p>
-      </div>
-      <div class="method-check">
-        <i class="fa-solid fa-circle"></i>
-      </div>
-    </div>
-
-    <button class="deposit-btn" id="proceedToRecharge" style="margin-top: 30px;">Proceed</button>
-  </div>
-</div>
-
-
-<div class="recharge-page" id="rechargePage" style="display:none;">
-
-  <div class="recharge-header-fixed">
-    <button class="recharge-back-btn-v2" id="rechargeBackBtn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
-    <h2>Deposit Funds</h2>
-    <button class="recharge-history-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline><path d="M3.3 7a10 10 0 0 1 17.4 0"></path></svg>
-    </button>
-  </div>
-
-  <div class="recharge-page-container" id="rechargePageContainer">
-    
-   <div class="balance-display-card">
-  <span class="balance-title">Available Balance</span>
-  <h1 class="balance-value">₦<span id="userBalance">0</span></h1>
-</div>
-    
-    <div class="recharge-card">
-      <p class="section-label">Deposit Amount <span class="label-note">(Minimum ₦3,000)</span></p>
-
-      <div class="custom-amount-wrapper">
-        <span class="currency-icon">₦</span>
-        <input type="number" id="customAmount" placeholder="Enter amount">
-      </div>
-
-      <p class="section-label centered">Quick Select</p>
-
-      <div class="amount-grid">
-        <div class="amount-option" data-value="3000">₦3,000</div>
-        <div class="amount-option" data-value="6000">₦6,000</div>
-        <div class="amount-option" data-value="10000">₦10,000</div>
-        <div class="amount-option" data-value="20000">₦20,000</div>
-        <div class="amount-option" data-value="30000">₦30,000</div>
-        <div class="amount-option" data-value="50000">₦50,000</div>
-        <div class="amount-option" data-value="100000">₦100,000</div>
-        <div class="amount-option" data-value="200000">₦200,000</div>
-      </div>
-      
-      <button class="deposit-btn" id="depositBtn">Deposit Now</button>
-    </div>
-
-    <div class="info-guidelines-box">
-      <h3 class="info-title">Important Information</h3>
-      <ul class="info-list">
-        <li>
-          <span class="info-icon">!</span>
-          <p>Do not modify the deposit amount after submission</p>
-        </li>
-        <li>
-          <span class="info-icon">!</span>
-          <p>Always initiate payments through this page</p>
-        </li>
-        <li>
-          <span class="info-icon">!</span>
-          <p>Deposits typically process within 5 minutes</p>
-        </li>
-        <li>
-          <span class="info-icon">!</span>
-          <p>Contact support if you experience delays</p>
-        </li>
-      </ul>
-    </div>
-    
-  </div>
-</div>
-
-
-<div class="recharge-page" id="manualDetailsPage" style="display:none;">
-  <div class="recharge-header-fixed">
-    <button class="recharge-back-btn-v2" id="methodBackBtn2" style="background:none; border:none; color:#ffffff;">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-    <h2>Recharge</h2>
-  </div>
-
-  <div class="recharge-page-container">
-    <div class="payment-card">
-      <div class="card-header-title">
-        <i class="fa-solid fa-building-columns"></i> Deposit Account
-      </div>
-
-
-      <div class="info-row">
-  <div class="info-col">
-    <span class="info-label">ACCOUNT NAME</span>
-    <span class="info-value" id="accNameDisplay">Loading...</span>
-  </div>
-  <button class="copy-icon-btn" onclick="copyDynamicText('accNameDisplay')">
-    <i class="fa-solid fa-copy"></i> Copy
-  </button>
-</div>
-
-<div class="info-row">
-  <div class="info-col">
-    <span class="info-label">ACCOUNT NUMBER</span>
-    <span class="info-value" id="accNumDisplay">Loading...</span>
-  </div>
-  <button class="copy-icon-btn" onclick="copyDynamicText('accNumDisplay')">
-    <i class="fa-solid fa-copy"></i> Copy
-  </button>
-</div>
-
-<div class="info-row">
-  <div class="info-col">
-    <span class="info-label">BANK NAME</span>
-    <span class="info-value" id="bankNameDisplay">Loading...</span>
-  </div>
-  <button class="copy-icon-btn" onclick="copyDynamicText('bankNameDisplay')">
-    <i class="fa-solid fa-copy"></i> Copy
-  </button>
-</div>
-
-      <div class="amount-banner">
-        <i class="fa-solid fa-wallet"></i> Amount to deposit: <span id="displayManualAmount">₦0</span>
-      </div>
-
-      <div class="warning-alert-box-amber">
-        <div class="alert-item">
-          <i class="fa-regular fa-circle-check"></i>
-          <p>Transfer the exact amount shown above</p>
+    <div class="amount-section-module">
+        <p style="font-weight:600; margin-bottom:10px;">Top up Amount</p>
+        <div class="amount-grid-layout">
+            <div class="amount-btn-item" data-value="3000">3,000</div>
+            <div class="amount-btn-item" data-value="6000">6,000</div>
+            <div class="amount-btn-item" data-value="12000">12,000</div>
+            <div class="amount-btn-item" data-value="24000">24,000</div>
+            <div class="amount-btn-item" data-value="48000">48,000</div>
+            <div class="amount-btn-item" data-value="96000">96,000</div>
+            <div class="amount-btn-item" data-value="192000">192,000</div>
+            <div class="amount-btn-item" data-value="384000">384,000</div>
         </div>
-        <div class="alert-item">
-          <i class="fa-regular fa-circle-check"></i>
-          <p>Use the copy buttons for accuracy when making your transfer</p>
+        <div class="custom-input-box">
+            <span style="color:#64748b; margin-right:10px;">₦</span>
+            <input type="number" id="customAmount" placeholder="3000" style="border:none; background:transparent; width:100%; outline:none;">
         </div>
-        <div class="alert-item">
-          <i class="fa-regular fa-circle-check"></i>
-          <p>After transfer, click "I Have Transferred the Money" below</p>
-        </div>
-      </div>
-
-      <p class="expiry-text">Please note that this payment expires on <br> <strong>every 30 mins</strong></p>
     </div>
 
-    <button id="goToSenderDetailsBtn" class="primary-gradient-btn">I Have Transferred the Money</button>
-    <button class="change-amount-btn" onclick="location.reload()">Change Amount</button>
-
-    <div class="help-box">
-      <h4>Need help?</h4>
-      <p>If you encounter any issues with your payment, please contact our support team immediately.</p>
-    </div>
-  </div>
-</div>
-
-<div class="recharge-page" id="senderDetailsPage" style="display:none;">
-  <div class="recharge-header-fixed">
-    <button class="recharge-back-btn-v2" id="senderBackToBankBtn" style="background:none; border:none; color:#ffffff;">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-    <h2>Sender Details</h2>
-  </div>
-
-  <div class="recharge-page-container">
-    <div class="payment-card">
-      <div class="card-header-title">
-        <i class="fa-solid fa-user-gear"></i> Sender Information
-      </div>
-
-      <label class="input-label">Sender Account Name</label>
-      <input type="text" id="senderName" class="payment-input" placeholder="ACCOUNT NAME">
-
-      <label class="input-label">Sender Account Number</label>
-      <input type="text" id="senderAccountNumber" class="payment-input" placeholder="Account Number">
-
-      <label class="input-label">Bank Name</label>
-      <input type="text" id="senderBank" class="payment-input" placeholder="BANK NAME">
-
-      <div class="warning-alert-box-amber" style="margin-top: 25px; margin-bottom: 5px;">
-        <div class="alert-item">
-          <i class="fa-solid fa-circle-info" style="color: #fbbf24;"></i>
-          <p>These details help us identify your payment quickly</p>
+    <div class="payment-section-module">
+        <p style="font-weight:600; margin-bottom:10px;">Payment Method</p>
+        <div class="channel-row-item active">
+            <div><strong>Payment Channel 1</strong><br><small style="color:#64748b;">Fast & Secure</small></div>
+            <div class="radio-select-dot"></div>
         </div>
-        <div class="alert-item">
-          <i class="fa-solid fa-circle-info" style="color: #fbbf24;"></i>
-          <p>Make sure the information matches your bank records</p>
+        <div class="channel-row-item">
+            <div><strong>Payment Channel 2</strong><br><small style="color:#64748b;">Fast & Secure</small></div>
+            <div class="radio-select-dot"></div>
         </div>
-      </div>
+        <button id="depositBtn" style="width:100%; padding:15px; background:#009ce0; color:white; border:none; border-radius:10px; cursor:pointer; margin-bottom: 20px;">Confirm</button>
     </div>
 
-    <button id="finalManualSubmit" class="primary-gradient-btn">Submit Deposit Request</button>
-    <button id="senderCancelBtn" class="change-amount-btn">Back to Bank Details</button>
-  </div>
-</div>
+    <div class="rech-rules-box" id="rechargeRulesBox">
+        <div class="rech-rules-header" id="rechargeRulesToggle">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-shield-halved" style="color:#9d4edd;"></i>
+                <span class="rech-rules-title">Recharge Rules</span>
+            </div>
+            <i class="fa-solid fa-chevron-down rech-rules-chevron" id="rechargeRulesChevron"></i>
+        </div>
+        <div class="rech-rules-body" id="rechargeRulesBody" style="display:none;">
+            <ul class="info-list" style="margin-top:12px;">
+                <li>
+                    <span class="info-icon">1</span>
+                    <p>Ensure the transfer amount matches exactly what you entered above.</p>
+                </li>
+                <li>
+                    <span class="info-icon">2</span>
+                    <p>Funds are usually credited within <span class="highlight-blue">5 minutes</span> of confirmation.</p>
+                </li>
+                <li>
+                    <span class="info-icon">3</span>
+                    <p>Keep your transaction receipt handy for support verification.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div> ```
+
+
 
 <div class="withdraw-page" id="withdrawPage" style="display:none;">
 
@@ -681,7 +538,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         WITHDRAWAL AMOUNT
       </div>
-      <div class="min-text-ev">MINIMUM WITHDRAWAL AMOUNT: 3,000₦</div>
+      <div class="min-text-ev">MINIMUM WITHDRAWAL AMOUNT: 600₦</div>
       
       <div class="withdraw-input-box-ev">
         <span class="currency-neon">₦</span>
@@ -707,7 +564,7 @@
           <div class="sub-card-value" id="withdrawAccountNumber">---</div>
         </div>
 
-        <div id="withdrawBankName" style="display:none;"></div>
+        <div id="withdrawBankName" style= "display:none;"></div>
       </div>
 
       <div id="bankEmptyState" style="display:none; text-align:center; padding: 15px;">
@@ -723,7 +580,7 @@
         WITHDRAWAL RULES
       </div>
 
-      <div class="rule-item-ev"><div class="rule-num">1</div><span>1. Minimum withdrawal amount: ₦3000.</span></div>
+      <div class="rule-item-ev"><div class="rule-num">1</div><span>1. Minimum withdrawal amount: ₦600.</span></div>
       <div class="rule-item-ev"><div class="rule-num">2</div><span>2. Withdrawal fee: 15%.</span></div>
       <div class="rule-item-ev"><div class="rule-num">3</div><span>3. Withdrawal time: 9:30 AM to 5:00 PM daily.</span></div>
       <div class="rule-item-ev"><div class="rule-num">4</div><span>4. Withdrawals usually arrive within 30 minutes to 24 hours.</span></div>

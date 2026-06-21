@@ -1576,554 +1576,125 @@ body {
 
 
 
-.recharge-header-fixed {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  gap: 15px;
-}
-
-.recharge-header-fixed h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-  color: #111827;
-}
-
-.recharge-page-container {
-  padding: 0 16px 20px 16px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-/* Base Card Elements */
-.payment-card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 20px;
-  margin-top: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.card-header-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-/* Individual Data Row Panels */
-.info-row {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 14px 18px;
-  margin-bottom: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.info-col {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.info-label {
-  color: #6b7280;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-}
-
-.info-value {
-  color: #10b981; 
-  font-weight: 700;
-  font-size: 1.05rem;
-}
-
-/* Dynamic Rounded Copy Buttons */
-.copy-icon-btn {
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  color: #10b981;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Banner Indicator Display */
-.amount-banner {
-  background: #f9fafb; 
-  color: #111827;
-  border-radius: 16px;
-  padding: 16px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  text-align: center;
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.amount-banner span {
-  font-size: 1.2rem;
-  color: #10b981;
-}
-
-/* Styled Alert Sub-Box Notification Box */
-.warning-alert-box-amber {
-  background: #fffbeb;
-  border: 0.5px solid #fde68a;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  position: relative;
-  overflow: hidden;
-}
-.warning-alert-box-amber::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: #f59e0b;
-}
-
-.alert-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.alert-item i {
-  color: #fbbf24;
-  font-size: 0.9rem;
-  margin-top: 3px;
-}
-
-.alert-item p {
-  color: #fde68a;
-  font-size: 0.82rem;
-  font-weight: 500;
-  margin: 0;
-  line-height: 1.4;
-}
-
-/* Input Styles */
-.input-label {
-  display: block;
-  text-align: left;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #9ca3af;
-  margin: 16px 0 6px 2px;
-}
-
-.payment-input {
-  width: 100%;
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
-  padding: 14px;
-  border-radius: 14px;
-  outline: none;
-  font-size: 0.9rem;
-  color: #111827;
-  box-sizing: border-box;
-}
-
-.payment-input:focus {
-  border-color: #10b981;
-}
-
-.expiry-text {
-  color: #6b7280;
-  font-size: 0.78rem;
-  margin-top: 20px;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* Luxury Interactive UI Buttons */
-.primary-gradient-btn {
-  background: linear-gradient(90deg, #064e3b, #022c22);
-  color: #111827;
-  border: none;
-  width: 100%;
-  padding: 16px;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 700;
-  margin-top: 20px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.change-amount-btn {
-  background: transparent;
-  color: #111827;
-  border: 2px solid #1c2333;
-  width: 100%;
-  padding: 14px;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 700;
-  margin-top: 12px;
-  cursor: pointer;
-}
-
-/* Bottom Technical Help Info Wrapper Box */
-.help-box {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px;
-  margin-top: 25px;
-}
-
-.help-box h4 {
-  color: #111827;
-  margin-top: 0;
-  margin-bottom: 6px;
-  font-size: 0.92rem;
-}
-
-.help-box p {
-  color: #6b7280;
-  font-size: 0.78rem;
-  line-height: 1.5;
-  margin: 0;
-}
 
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* High-Contrast Luxury Component System Variables */
 :root {
-  --bg-main: #f9fafb;         /* Pure dark canvas base */
-  --bg-card: #ffffff;         /* Sleek charcoal black container surfaces */
-  --text-main: #111827;       /* Crisp white titles */
-  --text-muted: #6b7280;      /* Elegant muted grey for text notes */
-  --accent-cyan: #059669;     /* Premium electric cyan accent highlight */
-  --accent-glow: rgba(5, 150, 105, 0.12);
-  --border-subtle: #e5e7eb;   /* Super-clean framing lines */
+    --brand-pink: #FF2A7A;
+    --brand-black: #000000;
+    --brand-white: #ffffff;
+    --bg-gray: #f4f7f9;
+    --border-gray: #e2e8f0;
 }
 
-/* 1. REMOVE 'min-height: 100vh' so the page can expand naturally */
-.recharge-page {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-main);
-  /* Change min-height to height: auto to allow scrolling */
-  height: auto; 
-  min-height: 100%;
-  width: 100%;
-  color: var(--text-main);
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  /* Ensure the body itself doesn't lock scroll */
-  overflow-y: auto; 
+/* Container for the page */
+.topup-wrapper {
+    background-color: var(--bg-gray);
+    font-family: 'Inter', sans-serif;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100vh;
+    overflow-y: auto;
 }
 
-.recharge-page-container {
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-  
-  /* Use padding to create the space, not height constraints */
-  padding: 85px 16px 80px 16px; 
-  
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  
-  /* THIS IS THE CHANGE: Use height: auto instead of 100vh */
-  height: auto; 
-  /* This ensures it can grow, but doesn't force a height that clips content */
-  min-height: calc(100vh - 165px); 
+.topup-header {
+    position: sticky;
+    top: 0;
+    height: 60px;
+    background: var(--brand-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border-gray);
+    z-index: 100;
+    position: relative;
 }
 
-/* ===== EXTREMELY CLEAN FIXED HEADER SWEEP ===== */
-.recharge-header-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 65px;
-  background-color: var(--bg-main);
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  box-sizing: border-box;
-  z-index: 1000;
+.topup-header h2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--brand-black);
+    pointer-events: none;
 }
 
-.recharge-header-fixed h2 {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-  margin: 0;
+#rechargeBackBtn, .recharge-history-btn {
+    background: transparent;
+    border: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.2s;
+    z-index: 10;
+    color: var(--brand-black);
 }
 
-.recharge-back-btn-v2, .recharge-history-btn {
-  background: transparent;
-  border: none;
-  color: var(--accent-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 8px;
-  transition: opacity 0.2s;
+#rechargeBackBtn:active, .recharge-history-btn:active {
+    background: #fdf2f5;
 }
 
-.recharge-back-btn-v2:active, .recharge-history-btn:active {
-  opacity: 0.5;
+/* Balance Card - Updated to Black & Pink */
+.balance-card-module {
+    margin: 16px; padding: 20px;
+    background: var(--brand-black);
+    border-radius: 16px;
+    border: 1px solid var(--brand-black);
+}
+.balance-label-text { font-size: 11px; color: #a1a1a1; font-weight: 700; }
+.balance-value-text { font-size: 26px; font-weight: 700; color: var(--brand-white); margin-top: 5px; }
+
+/* Amount Grid Module */
+.amount-section-module {
+    background: var(--brand-white); margin: 0 16px 16px 16px;
+    padding: 20px; border-radius: 16px;
+    border: 1px solid var(--border-gray);
+}
+.amount-grid-layout {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin: 15px 0;
+}
+.amount-btn-item {
+    background: var(--brand-white); border: 1px solid var(--border-gray);
+    padding: 12px 2px; border-radius: 8px;
+    text-align: center; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.amount-btn-item.active { background: var(--brand-pink); color: var(--brand-white); border-color: var(--brand-pink); }
+
+/* Input Styling */
+.custom-input-box {
+    background: #f8fafc; border: 1px solid var(--border-gray);
+    border-radius: 10px; display: flex; align-items: center;
+    padding: 0 16px; height: 50px;
 }
 
-
-
-/* ===== NATIVE AVAILABLE BALANCE CARD ===== */
-.balance-display-card {
-  width: 100%;
-  background: transparent; /* No floating cards, flat directly onto canvas background */
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  padding: 20px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* Payment Section */
+.payment-section-module {
+    background: var(--brand-white); margin: 16px;
+    padding: 16px; border-radius: 16px;
+    border: 1px solid var(--border-gray);
 }
-
-.balance-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-muted);
+.channel-row-item {
+    border: 1px solid var(--border-gray); border-radius: 12px;
+    padding: 14px; display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 10px;
 }
+.channel-row-item.active { border: 2px solid var(--brand-pink); }
+.radio-select-dot { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 50%; }
+.channel-row-item.active .radio-select-dot { background: var(--brand-pink); border-color: var(--brand-pink); }
 
-.balance-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.02em;
-}
 
-/* ===== THE INPUT CONTAINER BLOCK ===== */
-.recharge-card {
-  width: 100%;
-  background-color: var(--bg-card); /* Charcoal black container base layer */
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  padding: 24px 16px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
 
-.recharge-card .section-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 12px;
-  text-align: left;
-}
 
-.recharge-card .label-note {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 400;
-}
 
-.recharge-card .section-label.centered {
-  margin-top: 24px;
-  margin-bottom: 14px;
-  font-size: 14px;
-  color: var(--text-muted);
-}
 
-/* ===== CUSTOM TEXT AMOUNT FIELD BOX ===== */
-.custom-amount-wrapper {
-  background-color: var(--bg-main); /* Flips inward to dark canvas for maximum input contrast */
-  border: 1.5px solid var(--border-subtle);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  transition: all 0.2s ease;
-}
 
-.custom-amount-wrapper:focus-within {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
 
-.currency-icon {
-  color: var(--accent-cyan);
-  font-size: 18px;
-  font-weight: 700;
-  margin-right: 12px;
-}
-
-#customAmount {
-  background: transparent;
-  border: none;
-  color: var(--text-main);
-  font-size: 16px;
-  font-family: inherit;
-  font-weight: 500;
-  outline: none;
-  width: 100%;
-}
-
-#customAmount::placeholder {
-  color: #9ca3af;
-}
-
-/* ===== BALANCED GRID GRID SYSTEM ===== */
-.amount-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Exactly 3 columns side by side perfectly proportioned */
-  gap: 10px;
-  width: 100%;
-}
-
-.amount-option {
-  background-color: var(--bg-main); /* Native charcoal option frame backdrops */
-  border: 1px solid var(--border-subtle);
-  padding: 14px 4px;
-  border-radius: 10px;
-  text-align: center;
-  color: var(--text-main);
-  font-weight: 600;
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.amount-option:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-}
-
-.amount-option:active {
-  background-color: var(--accent-cyan);
-  color: #ffffff;
-  transform: scale(0.95);
-}
-
-/* ===== FLAT EXTREMELY VIBRANT ACTION BUTTON ===== */
-.deposit-btn {
-  width: 100%;
-  background-color: var(--accent-cyan);
-  color: #ffffff;
-  border: none;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 28px;
-  transition: all 0.2s ease;
-}
-
-.deposit-btn:hover {
-  background-color: #00d2ff;
-}
-
-.deposit-btn:active {
-  transform: scale(0.97);
-}
-
-/* ===== IMPORTANT OPERATIONAL RULES INFO BLOCK ===== */
-.info-guidelines-box {
-  width: 100%;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  padding: 20px 16px;
-  box-sizing: border-box;
-}
-
-.info-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent-cyan);
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
-}
-
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.info-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.info-icon {
-  width: 16px;
-  height: 16px;
-  background-color: var(--accent-cyan);
-  color: #ffffff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.info-list p {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-muted);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* High-resolution desktop media query system optimizer */
-@media (min-width: 576px) {
-  .recharge-page-container {
-    gap: 24px;
-  }
-  .recharge-card {
-    padding: 28px 24px;
-  }
-  .amount-grid {
-    gap: 12px;
-  }
-}
 
 .fintech-toast {
   border-radius: 10px;

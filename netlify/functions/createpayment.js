@@ -80,7 +80,7 @@ exports.handler = async (event) => {
 
     // ---- STEP 4: SEND TO GATEWAY ----
     const params = new URLSearchParams(data);
-    const response = await fetch("https://payrant.com/api-core/transaction/checkout.php?ref=TXN_1756911546_77_015d87df", {
+    const response = await fetch("https://api.nekpayment.com/pay/web", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,

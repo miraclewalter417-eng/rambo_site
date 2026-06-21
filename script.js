@@ -1203,11 +1203,14 @@ async function fetchBankDetails() {
       const data = docSnap.data().bankAccount;
       if (data) {
         if (document.getElementById("accNameDisplay"))
-          document.getElementById("accNameDisplay").innerText = data.accountName || "";
+          document.getElementById("accNameDisplay").innerText =
+            data.accountName || "";
         if (document.getElementById("accNumDisplay"))
-          document.getElementById("accNumDisplay").innerText = data.accountNumber || "";
+          document.getElementById("accNumDisplay").innerText =
+            data.accountNumber || "";
         if (document.getElementById("bankNameDisplay"))
-          document.getElementById("bankNameDisplay").innerText = data.bankName || "";
+          document.getElementById("bankNameDisplay").innerText =
+            data.bankName || "";
       } else {
         console.warn("No bankAccount object found in settings document.");
       }
@@ -1375,29 +1378,19 @@ async function loadBalance() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let selectedMethod = "automatic"; // Default state
   // 1. DOM Elements
-  const paymentMethodPage = document.getElementById("paymentMethodPage");
   const rechargePage = document.getElementById("rechargePage");
   const bottomNav = document.getElementById("bottomNav");
   const dashboard = document.getElementById("dashboard");
-
-  // Buttons that start the process from the dashboard
   const rechargeTriggers = document.querySelectorAll(
-    ".qa-btn.recharge, #mainRechargeTrigger, .action-btn#depositBtn",
+    ".qa-btn.recharge, #mainRechargeTrigger",
   );
-
-  const proceedToRecharge = document.getElementById("proceedToRecharge");
-  const methodBackBtn = document.getElementById("methodBackBtn");
   const rechargeBackBtn = document.getElementById("rechargeBackBtn");
 
-  // 1. OPEN RECHARGE PAGE DIRECTLY (Bypassing Method Selection)
+  // 2. OPEN RECHARGE PAGE
   rechargeTriggers.forEach((btn) => {
     btn.addEventListener("click", () => {
       if (!rechargePage) return;
-
-      // We force the variable to manual globally
-      selectedMethod = "manual";
 
       if (typeof showLoader === "function") {
         showLoader({
@@ -1409,7 +1402,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (dashboard) dashboard.style.display = "none";
             if (bottomNav) bottomNav.style.display = "none";
-
             rechargePage.style.display = "block";
           },
         });
@@ -1419,7 +1411,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 2. BACK BUTTONS
+  // 3. BACK BUTTON
   if (rechargeBackBtn) {
     rechargeBackBtn.addEventListener("click", () => {
       rechargePage.style.display = "none";
@@ -1428,212 +1420,130 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (methodBackBtn2) {
-    methodBackBtn2.addEventListener("click", () => {
-      manualDetailsPage.style.display = "none";
-      rechargePage.style.display = "block";
+  // 4. AMOUNT SELECTION & NEKPAY INTEGRATION
+  if (!rechargePage) return;
+
+  // ✅ KEEPING THE HTML GRID FIX: Targets '.amount-btn-item'
+  const amountOptions = rechargePage.querySelectorAll(".amount-btn-item");
+  const customInput = rechargePage.querySelector("#customAmount");
+  const depositBtn = rechargePage.querySelector("#depositBtn");
+
+  amountOptions.forEach((option) => {
+    option.addEventListener("click", function () {
+      amountOptions.forEach((opt) => opt.classList.remove("active"));
+      this.classList.add("active");
+      if (customInput) customInput.value = this.dataset.value;
     });
-  }
+  });
 
-  // 3. AMOUNT SELECTION & MANUAL REDIRECTION
-  if (rechargePage) {
-    const amountOptions = rechargePage.querySelectorAll(".amount-option");
-    const customInput = rechargePage.querySelector("#customAmount");
-    const depositBtn = rechargePage.querySelector("#depositBtn");
+  if (!depositBtn) return;
 
-    amountOptions.forEach((option) => {
-      option.addEventListener("click", function () {
-        amountOptions.forEach((opt) => opt.classList.remove("active"));
-        this.classList.add("active");
-        if (customInput) customInput.value = this.dataset.value;
-      });
-    });
+  depositBtn.innerText = "Proceed to Payment";
 
-    if (depositBtn) {
-      depositBtn.innerText = "Proceed to Transfer";
-      depositBtn.addEventListener("click", async () => {
-        if (!customInput) return;
-
-        const amount = Number(customInput.value);
-        const user = auth?.currentUser;
-
-        if (!user) {
-          Swal.fire({
-            icon: "warning",
-            title: "Authentication Required",
-            html: `<p style="opacity:.8">Please login to continue</p>`,
-            background: "rgba(20,20,25,0.95)",
-            color: "#fff",
-            confirmButtonColor: "#007bff",
-          });
-          return;
-        }
-
-        if (!amount || amount < 1000) {
-          Swal.fire({
-            icon: "warning",
-            title: "Minimum Recharge Not Met",
-            html: `<p style="opacity:.8">Minimum recharge is ₦1,000</p>`,
-            background: "rgba(20,20,25,0.95)",
-            color: "#fff",
-            confirmButtonColor: "#007bff",
-          });
-          return;
-        }
-
-        document.getElementById("displayManualAmount").innerText =
-          `₦${amount.toLocaleString()}`;
-        rechargePage.style.display = "none";
-        document.getElementById("manualDetailsPage").style.display = "block";
-      });
-    }
-  }
-
-  // ================= STEP PAGE TRANSITIONING HANDLERS =================
-  const goToSenderDetailsBtn = document.getElementById("goToSenderDetailsBtn");
-  const senderBackToBankBtn = document.getElementById("senderBackToBankBtn");
-  const senderCancelBtn = document.getElementById("senderCancelBtn");
-  const manualDetailsPageEl = document.getElementById("manualDetailsPage");
-  const senderDetailsPageEl = document.getElementById("senderDetailsPage");
-
-  if (goToSenderDetailsBtn) {
-    goToSenderDetailsBtn.addEventListener("click", () => {
-      manualDetailsPageEl.style.display = "none";
-      senderDetailsPageEl.style.display = "block";
-    });
-  }
-
-  const returnToBankDetailsView = () => {
-    senderDetailsPageEl.style.display = "none";
-    manualDetailsPageEl.style.display = "block";
+  // Shared alert style
+  const alertStyle = {
+    background: "#ffffff",
+    color: "#1e3a5f",
+    confirmButtonColor: "#3b82f6",
   };
 
-  if (senderBackToBankBtn)
-    senderBackToBankBtn.addEventListener("click", returnToBankDetailsView);
-  if (senderCancelBtn)
-    senderCancelBtn.addEventListener("click", returnToBankDetailsView);
+  depositBtn.addEventListener("click", async () => {
+    if (!customInput) return;
 
-  // 4. FINAL MANUAL SUBMISSION (To Transaction Database)
-  const finalManualSubmit = document.getElementById("finalManualSubmit");
+    const amount = Number(customInput.value);
 
-  if (finalManualSubmit) {
-    finalManualSubmit.addEventListener("click", async () => {
-      const user = auth?.currentUser;
-      const amount = Number(document.getElementById("customAmount").value);
-      const senderName = document.getElementById("senderName").value.trim();
-      const senderBank = document.getElementById("senderBank").value.trim();
+    // ✅ RESTORED: Firebase Auth integration
+    const user = auth?.currentUser;
 
-      if (!user) return;
-      if (!senderName || !senderBank) {
+    if (!user) {
+      Swal.fire({
+        ...alertStyle,
+        icon: "warning",
+        title: "Authentication Required",
+        text: "Please login to continue",
+      });
+      return;
+    }
+
+    // ✅ PRESERVED: Fixed clean conditional logic statement
+    if (!amount || amount < 1000) {
+      Swal.fire({
+        ...alertStyle,
+        icon: "warning",
+        title: "Minimum Recharge",
+        text: "Minimum recharge is ₦1,000",
+      });
+      return;
+    }
+
+    // Show loading
+    Swal.fire({
+      ...alertStyle,
+      title: "Processing Payment",
+      text: "Please wait while we prepare your secure checkout...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      // ✅ RESTORED: Querying Firebase Firestore safely
+      const activeQuery = await getDocs(
+        query(
+          collection(transactionDb, "deposits"),
+          where("uid", "==", user.uid),
+          where("status", "in", ["pending", "awaiting_payment", "processing"]),
+          limit(1),
+        ),
+      );
+
+      if (!activeQuery.empty) {
         Swal.fire({
-          icon: "warning",
-          title: "Missing Info",
-          text: "Please provide your sender name and bank for confirmation.",
-          background: "#1c2333",
-          color: "#fff",
-          confirmButtonColor: "#10b981",
+          ...alertStyle,
+          icon: "info",
+          title: "Deposit In Progress",
+          text: "You already have a deposit being processed. Please wait for it to complete before making another.",
         });
         return;
       }
 
-      Swal.fire({
-        title: "Submitting Request",
-        html: '<p style="color:#676d7d;font-size:14px;">Sending your transfer details to admin...</p>',
-        background: "#1c2333",
-        color: "#fff",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+      // ✅ RESTORED: Firestore auto-generated document identification key reference
+      const depositId = doc(collection(transactionDb, "deposits")).id;
+
+      const res = await fetch("/.netlify/functions/createPayment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          depositId,
+          userId: user.uid,
+        }),
       });
 
-      try {
-        let userPhoneNumber = localStorage.getItem("u_phone") || "N/A";
-        if (userPhoneNumber === "N/A") {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            userPhoneNumber = userDoc.data().number || "N/A";
-            localStorage.setItem("u_phone", userPhoneNumber);
-          }
-        }
+      if (!res.ok) throw new Error("Server error. Please try again.");
 
-        // Optional field value collection check for database logging tracking
-        const senderAccNumEl = document.getElementById("senderAccountNumber");
-        const senderAccNumValue = senderAccNumEl
-          ? senderAccNumEl.value.trim()
-          : "N/A";
+      const data = await res.json();
 
-        await addDoc(collection(transactionDb, "manualDeposits"), {
-          uid: user.uid,
-          userEmail: user.email || "N/A",
-          userPhone: userPhoneNumber,
-          amount: amount,
-          senderName: senderName,
-          senderBank: senderBank,
-          senderAccountNo: senderAccNumValue,
-          status: "pending",
-          method: "Manual Bank Transfer",
-          timestamp: serverTimestamp(),
-          dateString: new Date().toLocaleString(),
+      if (data.respCode === "SUCCESS" && data.payInfo) {
+        Swal.update({
+          title: "Redirecting...",
+          text: "Taking you to the payment page now.",
         });
-
-        Swal.fire({
-          icon: "success",
-          title: "Request Received",
-          html: `
-          <div style="text-align:center; line-height:1.6;">
-            <p style="margin:0; font-size:15px;">Your ₦${amount.toLocaleString()} deposit is pending.</p>
-            <p style="margin-top:8px; color:#676d7d; font-size:13px;">Admin will verify your transfer shortly.</p>
-          </div>
-        `,
-          confirmButtonColor: "#10b981",
-          background: "#1c2333",
-          color: "#fff",
-        }).then(() => {
-          // Clear forms out and turn pages off safely
-          if (senderAccNumEl) senderAccNumEl.value = "";
-          document.getElementById("senderName").value = "";
-          document.getElementById("senderBank").value = "";
-
-          senderDetailsPageEl.style.display = "none";
-          if (dashboard) dashboard.style.display = "block";
-          if (bottomNav) bottomNav.style.display = "flex";
-        });
-      } catch (error) {
-        console.error("Manual Submission Failed:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Submission Failed",
-          text: "System busy. Please try again or contact support.",
-          background: "#1c2333",
-          color: "#fff",
-        });
+        window.location.href = data.payInfo;
+      } else {
+        throw new Error(data.tradeMsg || "Payment setup failed");
       }
-    });
-  }
-});
-
-// Function to handle the copy button
-window.copyText = (text) => {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      // Show a small toast to let the user know it worked
+    } catch (err) {
+      console.error("Nekpay Process Failed:", err);
       Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "success",
-        title: "Account number copied!",
-        showConfirmButton: false,
-        timer: 2000,
-        background: "#1c2333",
-        color: "#fff",
+        ...alertStyle,
+        icon: "error",
+        title: "Payment Error",
+        text: err.message,
       });
-    })
-    .catch((err) => {
-      console.error("Failed to copy: ", err);
-    });
-};
+    }
+  });
+});
 
 const profilePage = document.getElementById("profilePage");
 

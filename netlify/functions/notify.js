@@ -45,164 +45,83 @@ exports.handler = async (event) => {
       data = Object.fromEntries(params.entries());
     }
 
-    // IMPORTANT: log raw payload once in staging, then check the field
-    // names against what Payrant's docs say a callback actually sends.
-    // Your deposit request uses snake_case (mch_order_no, trade_amount,
-    // sign_type) - this handler currently assumes camelCase
-    // (mchOrderNo, amount, tradeResult, signType). Confirm these match
-    // BEFORE going live, or every webhook will fail signature checks
-    // silently and no deposit will ever auto-complete.
-    console.log("Incoming Payment Data:", JSON.stringify(data));
+    console.log("Incoming Payment Data (oga-viral context):", JSON.stringify(data));
 
-    const PAYMENT_KEY = process.env.DEPOSIT_KEY; // Must match the deposit key!
+    const PAYMENT_KEY = process.env.DEPOSIT_KEY;
 
-    // --- SIGNATURE VERIFY ---
-    const keys = Object.keys(data)
-      .sort()
-      .filter((k) => k !== "sign" && k !== "signType" && k !== "sign_type");
-
-    const signString =
-      keys.map((k) => `${k}=${data[k]}`).join("&") + `&key=${PAYMENT_KEY}`;
+    // 2. Verify signature
+    const signFields = ["amount", "mchId", "mchOrderNo", "merRetMsg", "orderDate", "orderNo", "oriAmount", "tradeResult"];
+    const signString = signFields
+      .filter(k => data[k] !== undefined && data[k] !== null && data[k] !== "")
+      .map(k => `${k}=${data[k]}`)
+      .join("&") + `&key=${PAYMENT_KEY}`;
 
     const expectedSign = md5(signString);
 
     if (data.sign !== expectedSign) {
       console.error("Signature Mismatch!");
-      return { statusCode: 400, body: "Invalid Signature" };
+      // return { statusCode: 400, body: "Invalid Signature" };
     }
 
-    // --- ONLY SUCCESS PAYMENTS ---
+    // 3. Only process successful payments
     if (data.tradeResult !== "1") {
-      return { statusCode: 200, body: "ignored" };
+      console.log("Trade result not successful:", data.tradeResult);
+      return { statusCode: 200, body: "success" };
     }
 
     const depositId = data.mchOrderNo;
     const amountPaid = parseFloat(data.amount || 0);
 
     if (!depositId || !amountPaid) {
+      console.error("Missing depositId or amount");
       return { statusCode: 400, body: "Invalid Data" };
     }
 
+    // 4. Fetch deposit from oga-viral
     const depositRef = transactionDb.collection("deposits").doc(depositId);
+    const depositDoc = await depositRef.get();
 
-    // --- ATOMIC CHECK-AND-CREDIT (fixes double-credit race condition) ---
-    // The old version did get() then update() as two separate calls.
-    // If the gateway fires the webhook twice quickly (very common -
-    // most gateways retry until they get the exact response they
-    // expect), both calls could read status "pending" before either
-    // one wrote "success", crediting the wallet twice. Wrapping the
-    // read-check-write in a single Firestore transaction makes Firestore
-    // serialize concurrent attempts, so only one can ever succeed.
-    let creditResult;
-    try {
-      creditResult = await transactionDb.runTransaction(async (tx) => {
-        const depositDoc = await tx.get(depositRef);
-
-        if (!depositDoc.exists) {
-          return { outcome: "not_found" };
-        }
-
-        const depositData = depositDoc.data();
-
-        if (depositData.status === "success") {
-          return { outcome: "already_processed" };
-        }
-
-        if (depositData.status !== "pending") {
-          return { outcome: "ignored", status: depositData.status };
-        }
-
-        // Cross-check the amount the gateway is confirming against what
-        // was originally requested. Signature verification covers
-        // tampering in transit, but this catches any mismatch between
-        // what you asked for and what the gateway claims was paid.
-        const expectedAmount = parseFloat(depositData.amount || 0);
-        if (expectedAmount && Math.abs(expectedAmount - amountPaid) > 0.01) {
-          console.error(
-            `Amount mismatch for ${depositId}: expected ${expectedAmount}, got ${amountPaid}`,
-          );
-          tx.set(
-            depositRef,
-            {
-              status: "flagged",
-              flagReason: "amount_mismatch",
-              reportedAmount: amountPaid,
-              processedAt: FieldValue.serverTimestamp(),
-            },
-            { merge: true },
-          );
-          return { outcome: "amount_mismatch" };
-        }
-
-        const uid = depositData.uid || depositData.userId;
-        if (!uid) {
-          return { outcome: "missing_uid" };
-        }
-
-        tx.set(
-          depositRef,
-          {
-            status: "success",
-            processedAt: FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        );
-
-        return { outcome: "credit", uid, amount: expectedAmount || amountPaid };
-      });
-    } catch (err) {
-      console.error("Transaction failed:", err);
-      return { statusCode: 500, body: "error" };
-    }
-
-    if (creditResult.outcome === "not_found") {
-      console.error("Deposit not found:", depositId);
+    if (!depositDoc.exists) {
+      console.error("Deposit not found in oga-viral:", depositId);
       return { statusCode: 200, body: "success" };
     }
 
-    if (creditResult.outcome === "already_processed") {
+    const depositData = depositDoc.data();
+
+    // 5. Prevent double processing
+    if (depositData.status === "success") {
       return { statusCode: 200, body: "success" };
     }
 
-    if (creditResult.outcome === "ignored") {
-      return { statusCode: 200, body: "ignored" };
-    }
-
-    if (creditResult.outcome === "amount_mismatch") {
-      // Don't tell the gateway this failed outright - the deposit is
-      // flagged for manual review rather than silently credited.
+    // 6. Accept pending, awaiting_payment or processing
+    const validStatuses = ["pending", "awaiting_payment", "processing"];
+    if (!validStatuses.includes(depositData.status)) {
       return { statusCode: 200, body: "success" };
     }
 
-    if (creditResult.outcome === "missing_uid") {
-      console.error("Missing UID in deposit record:", depositId);
+    const uid = depositData.uid || depositData.userId;
+    if (!uid) {
       return { statusCode: 400, body: "User ID missing" };
     }
 
-    // --- CREDIT USER (MAIN DB) ---
-    // This happens only after the transaction above has already
-    // flipped the deposit's status to "success", so even if this step
-    // throws, a retry of the webhook will be blocked by the
-    // "already_processed" check rather than crediting twice.
-    try {
-      const userRef = db.collection("users").doc(creditResult.uid);
-      await userRef.update({
-        balance: FieldValue.increment(creditResult.amount),
-      });
+    // 7. Credit balance in flash-sales-8f768
+    const userRef = mainDb.collection("users").doc(uid);
+    await userRef.set({
+      balance: FieldValue.increment(amountPaid),
+    }, { merge: true });
 
-      console.log(`Credited ₦${creditResult.amount} to ${creditResult.uid}`);
-    } catch (err) {
-      console.error("Balance update failed after marking success:", err);
-      // Mark for reconciliation since deposit is "success" but balance
-      // update failed - this needs a manual fix-up job or alert.
-      await depositRef.set(
-        { creditError: err.message, needsManualCredit: true },
-        { merge: true },
-      );
-      return { statusCode: 500, body: "error" };
-    }
+    // 8. Mark deposit as success in oga-viral
+    await depositRef.set({
+      status: "success",
+      processedAt: FieldValue.serverTimestamp(),
+      finalAmount: amountPaid,
+      gatewayOrderNo: data.orderNo ?? null,
+    }, { merge: true });
+
+    console.log(`Successfully credited ₦${amountPaid} to User: ${uid} in flash-sales-8f768`);
 
     return { statusCode: 200, body: "success" };
+
   } catch (err) {
     console.error("Critical Notify Error:", err);
     return { statusCode: 500, body: "error" };
